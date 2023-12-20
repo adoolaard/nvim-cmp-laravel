@@ -83,9 +83,7 @@ end
 -- Deze functie wordt gebruikt door nvim-cmp om de source te identificeren
 function source.get_keyword_pattern()
 	-- return [[\w+]]
-    -- return [[\croute\w*]]
-    -- return [A-Za-z]+\('.*'\)
-    return [[\croute\w*]]+\('.*'\)
+    return [[\croute('\w*]]
 end
 
 -- Minimale lengte van de keyword om de source te triggeren
