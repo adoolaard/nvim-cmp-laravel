@@ -17,7 +17,7 @@ end
 
 -- Haal Laravel routes op
 function source.get_laravel_routes()
-    vim.notify("Haal Laravel routes op")
+    print("Haalt de laravel routes op")
 	local routes = {}
 	-- Verkrijg de huidige werkdirectory en voeg de pad naar het routes bestand toe
 	local routes_php_path = vim.loop.cwd() .. "/routes/web.php"
