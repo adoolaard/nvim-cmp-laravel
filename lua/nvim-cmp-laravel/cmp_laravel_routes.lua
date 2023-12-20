@@ -91,7 +91,7 @@ function source.get_trigger_characters()
         "route('",
         "route(\"",
         "{{ route('",
-        "{{ route(\""
+        "{{ route(\"",
         "."
     } -- Pas dit aan indien nodig voor je use-case
 end
