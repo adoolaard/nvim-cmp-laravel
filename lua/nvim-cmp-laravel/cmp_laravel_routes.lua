@@ -31,24 +31,37 @@ function get_framework_version(callback)
   }):start()
 end
 
+function extract_routes(content, framework)
+  local routes = {}
+  if framework == 'laravel' then
+    -- Laravel regex pattern
+    for alias in string.gmatch(content, "->name%('([^']+)") do
+      table.insert(routes, { label = alias, kind = cmp.lsp.CompletionItemKind.Text })
+    end
+  elseif framework == 'lumen' then
+    -- Lumen regex pattern
+    for alias in string.gmatch(content, "'as'%s*=>%s*'([^']+)'") do
+      table.insert(routes, { label = alias, kind = cmp.lsp.CompletionItemKind.Text })
+    end
+  end
+  return routes
+end
+
 function source.get_laravel_routes(callback)
   get_framework_version(function(framework)
-    local routes = {}
-    local routes_php_path = vim.loop.cwd() .. (framework == 'laravel' and '/routes/web.php' or '/app/Http/routes.php')
+    local routes_php_path = vim.loop.cwd() .. '/routes/web.php'
 
     local file = io.open(routes_php_path, "r")
     if file then
       local content = file:read("*all")
       file:close()
 
-      for alias in string.gmatch(content, "%'as'%s*=>%s*%'([^']+)%'") do
-        table.insert(routes, { label = alias, kind = cmp.lsp.CompletionItemKind.Text })
-      end
+      local routes = extract_routes(content, framework)
+      callback(routes)
     else
       vim.notify("Kon het bestand niet openen: " .. routes_php_path)
+      callback({})
     end
-
-    callback(routes)
   end)
 end
 -- Deze functie wordt gebruikt door nvim-cmp om de source te identificeren
