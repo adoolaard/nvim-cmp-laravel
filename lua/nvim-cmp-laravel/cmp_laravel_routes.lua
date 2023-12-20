@@ -87,7 +87,7 @@ end
 
 -- Deze functie wordt gebruikt door nvim-cmp voor het sorteren van items
 function source.get_trigger_characters()
-	return { "route('" } -- Pas dit aan indien nodig voor je use-case
+	return { "route('", "route('')"} -- Pas dit aan indien nodig voor je use-case
 end
 
 -- Deze functie wordt gebruikt om de source te identificeren (optioneel)
