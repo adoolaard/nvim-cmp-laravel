@@ -93,8 +93,9 @@ function source.get_trigger_characters()
         "{{ route('",
         "{{ route(\"",
         ".",
-        "route"
-    } -- Pas dit aan indien nodig voor je use-case
+        "route",
+        ","
+    }
 end
 -- Deze functie wordt gebruikt om de source te identificeren (optioneel)
 function source.is_available()
