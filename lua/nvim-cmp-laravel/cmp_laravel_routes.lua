@@ -15,6 +15,7 @@ function source.complete(self, request, callback)
   callback({ items = routes })  -- Geef de routes terug aan nvim-cmp
 end
 
+
 function get_framework_version(callback)
   Job:new({
     command = 'php',
@@ -31,36 +32,27 @@ function get_framework_version(callback)
   }):start()
 end
 
-function extract_routes(content, framework)
-  local routes = {}
-  if framework == 'laravel' then
-    -- Laravel regex pattern
-    for alias in string.gmatch(content, "->name%('([^']+)") do
-      table.insert(routes, { label = alias, kind = cmp.lsp.CompletionItemKind.Text })
-    end
-  elseif framework == 'lumen' then
-    -- Lumen regex pattern
-    for alias in string.gmatch(content, "'as'%s*=>%s*'([^']+)'") do
-      table.insert(routes, { label = alias, kind = cmp.lsp.CompletionItemKind.Text })
-    end
-  end
-  return routes
-end
-
 function source.get_laravel_routes(callback)
   get_framework_version(function(framework)
-    local routes_php_path = vim.loop.cwd() .. '/routes/web.php'
+    local routes = {}
+    local routes_php_path = vim.loop.cwd() .. (framework == 'laravel' and '/routes/web.php' or '/app/Http/routes.php')
 
     local file = io.open(routes_php_path, "r")
     if file then
       local content = file:read("*all")
       file:close()
 
-      local routes = extract_routes(content, framework)
-      callback(routes)
+      for alias in string.gmatch(content, "%'as'%s*=>%s*%'([^']+)%'") do
+        table.insert(routes, { label = alias, kind = cmp.lsp.CompletionItemKind.Text })
+      end
     else
       vim.notify("Kon het bestand niet openen: " .. routes_php_path)
-      callback({})
+    end
+
+    if callback then
+      callback(routes)
+    else
+      vim.notify("Geen callback functie doorgegeven aan get_laravel_routes")
     end
   end)
 end
