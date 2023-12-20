@@ -9,9 +9,22 @@ function source.new()
 end
 
 -- Deze functie wordt aangeroepen door nvim-cmp om de beschikbare items te krijgen
+-- function source.complete(self, request, callback)
+-- 	local routes = source.get_laravel_routes() -- Roep je functie aan om de routes op te halen
+-- 	callback({ items = routes }) -- Geef de routes terug aan nvim-cmp
+-- end
 function source.complete(self, request, callback)
-	local routes = source.get_laravel_routes() -- Roep je functie aan om de routes op te halen
-	callback({ items = routes }) -- Geef de routes terug aan nvim-cmp
+    local context = request.context
+    local line = context.cursor_before_line
+    local cursor_col = context.cursor.col
+
+    -- Check of de lijn eindigt met " route('"
+    if string.sub(line, 1, cursor_col - 1):match(" route%('") then
+        local routes = source.get_laravel_routes() -- Haal routes op
+        callback({ items = routes }) -- Geef de routes terug aan nvim-cmp
+    else
+        callback({ items = {'geen routes '} }) -- Geen matches, geef een lege lijst terug
+    end
 end
 
 -- Check de framework versie. Met "php artisan --version" staat er in een Lumen project ook "Lumen"
@@ -92,8 +105,11 @@ function source.get_keyword_length()
 end
 
 -- Deze functie wordt gebruikt door nvim-cmp voor het sorteren van items
+-- function source.get_trigger_characters()
+-- 	return { "." } -- Pas dit aan indien nodig voor je use-case
+-- end
 function source.get_trigger_characters()
-	return { "." } -- Pas dit aan indien nodig voor je use-case
+    return { "'", "(", "." } -- Voeg enkele extra tekens toe die relevant zijn
 end
 
 -- Deze functie wordt gebruikt om de source te identificeren (optioneel)
