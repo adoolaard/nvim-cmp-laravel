@@ -100,6 +100,7 @@ function source.get_trigger_characters()
         "{{ route('",
         "{{ route(\"",
         ".",
+        ",",
         "route"
     }
 end
