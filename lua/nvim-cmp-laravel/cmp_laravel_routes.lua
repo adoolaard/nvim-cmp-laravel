@@ -19,7 +19,7 @@ function source.complete(self, request, callback)
     local cursor_col = context.cursor.col
 
     -- Check of de lijn eindigt met " route('"
-    if string.sub(line, 1, cursor_col - 1):match(" route%('") then
+    if string.sub(line, 1, cursor_col - 1):match("route%('") then
         local routes = source.get_laravel_routes() -- Haal routes op
         callback({ items = routes }) -- Geef de routes terug aan nvim-cmp
     else
@@ -96,7 +96,8 @@ end
 -- Deze functie wordt gebruikt door nvim-cmp om de source te identificeren
 function source.get_keyword_pattern()
 	-- return [[\w+]]
-    return [[\croute('\w*]]
+    -- return [[\croute('\w*]]
+    return [[\%(\s\|^\|[\({,=:]|\%(\.\|::\)\)\zsroute('\w*\)]]
 end
 
 -- Minimale lengte van de keyword om de source te triggeren
