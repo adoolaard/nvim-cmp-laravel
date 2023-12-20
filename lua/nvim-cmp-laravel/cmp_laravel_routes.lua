@@ -85,7 +85,14 @@ function source.get_keyword_pattern()
 	return [[\w+]] -- Pas dit aan indien nodig voor je use-case
 end
 
+function source.get_keyword_length()
+    return 5 -- Pas dit aan indien nodig voor je use-case
+end
+
 -- Deze functie wordt gebruikt door nvim-cmp voor het sorteren van items
+-- function source.get_trigger_characters()
+-- 	return { "." } -- Pas dit aan indien nodig voor je use-case
+-- end
 function source.get_trigger_characters()
     return {
         "route('",
@@ -93,10 +100,10 @@ function source.get_trigger_characters()
         "{{ route('",
         "{{ route(\"",
         ".",
-        "route",
-        ","
+        "route"
     }
 end
+
 -- Deze functie wordt gebruikt om de source te identificeren (optioneel)
 function source.is_available()
 	return true
