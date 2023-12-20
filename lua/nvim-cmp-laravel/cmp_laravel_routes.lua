@@ -15,7 +15,6 @@ function source.complete(self, request, callback)
   callback({ items = routes })  -- Geef de routes terug aan nvim-cmp
 end
 
-
 function get_framework_version(callback)
   Job:new({
     command = 'php',
@@ -50,6 +49,12 @@ function extract_routes(content, framework)
 end
 
 function source.get_laravel_routes(callback)
+  -- Zorg ervoor dat de callback bestaat voordat we verder gaan
+  if not callback then
+    vim.notify("Geen callback functie doorgegeven aan get_laravel_routes")
+    return
+  end
+
   get_framework_version(function(framework)
     local routes_php_path = vim.loop.cwd() .. '/routes/web.php'
     local file = io.open(routes_php_path, "r")
