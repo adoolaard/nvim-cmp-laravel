@@ -1,3 +1,5 @@
+print("Laravel routes source is now available.")
+
 local cmp = require("cmp")
 
 local source = {}

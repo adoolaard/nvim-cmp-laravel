@@ -1,4 +1,5 @@
 local cmp_laravel_routes = require('nvim-cmp-laravel.cmp_laravel_routes')
+print("Setting up Laravel autocomplete...")
 
 return {
   setup = function()
