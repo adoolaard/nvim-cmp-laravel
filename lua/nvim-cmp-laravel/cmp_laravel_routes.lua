@@ -68,7 +68,7 @@ function source.get_laravel_routes()
     file:close()
 
     if source.is_laravel() then
-      for alias in string.gmatch(content, "%'as'%s*=>%s*%'([^']+)%'") do
+      for alias in string.gmatch(content, "->name%('([^']*)'%)") do
         -- Gebruik een statische waarde voor 'kind' of laat het weg
         table.insert(routes, { label = alias, kind = cmp.lsp.CompletionItemKind.Text })
       end
