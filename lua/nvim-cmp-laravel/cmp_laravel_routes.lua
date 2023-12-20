@@ -84,7 +84,7 @@ end
 function source.get_keyword_pattern()
 	-- return [[\w+]]
     -- return [[\croute\w*]]
-    return [[\croute\w*|\{\{\s*route\(['"]?]]
+    return [[\croute\w*|\{\{\s*route\(['"]]]
 end
 
 -- Minimale lengte van de keyword om de source te triggeren
