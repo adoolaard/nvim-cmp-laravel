@@ -15,22 +15,33 @@ function source.complete(self, request, callback)
 end
 
 -- Check de framework versie. Met "php artisan --version" staat er in een Lumen project ook "Lumen"
+
 function source.is_laravel()
+	local is_laravel = false
+	local is_lumen = false
+
 	local job = Job:new({
 		command = "php",
 		args = { "artisan", "--version" },
 		cwd = vim.loop.cwd(),
 		on_exit = function(j, return_val)
+			local result = j:result()
 			if return_val == 0 then
-				return true
-			else
-				return false
+				local version_output = table.concat(result, " ")
+				if version_output:match("Laravel Framework") then
+					is_laravel = true
+					if version_output:match("Lumen") then
+						is_lumen = true
+					end
+				end
 			end
 		end,
 	})
 
-	local result = job:sync()
-	return result[1] == "Laravel Framework"
+	job:sync() -- This will wait for the job to finish
+
+	-- Return two booleans: is_laravel, is_lumen
+	return is_laravel, is_lumen
 end
 
 -- Haal Laravel routes op
@@ -66,18 +77,36 @@ function source.get_laravel_routes()
 		local content = file:read("*all")
 		file:close()
 
-		if source.is_laravel() then
-			print("Laravel project")
+		-- if source.is_laravel() then
+		-- 	print("Laravel project")
+		-- 	for alias in string.gmatch(content, "->name%('([^']*)'%)") do
+		-- 		-- Gebruik een statische waarde voor 'kind' of laat het weg
+		-- 		table.insert(routes, { label = alias, kind = cmp.lsp.CompletionItemKind.Text })
+		-- 	end
+		-- else
+		-- 	print("Lumen project")
+		-- 	for alias in string.gmatch(content, "%'as'%s*=>%s*%'([^']+)%'") do
+		-- 		-- Gebruik een statische waarde voor 'kind' of laat het weg
+		-- 		table.insert(routes, { label = alias, kind = cmp.lsp.CompletionItemKind.Text })
+		-- 	end
+		-- end
+		local is_laravel, is_lumen = source.is_laravel()
+		if is_laravel then
+			print("Dit is een Laravel project.")
 			for alias in string.gmatch(content, "->name%('([^']*)'%)") do
 				-- Gebruik een statische waarde voor 'kind' of laat het weg
 				table.insert(routes, { label = alias, kind = cmp.lsp.CompletionItemKind.Text })
 			end
-		else
-			print("Lumen project")
-			for alias in string.gmatch(content, "%'as'%s*=>%s*%'([^']+)%'") do
-				-- Gebruik een statische waarde voor 'kind' of laat het weg
-				table.insert(routes, { label = alias, kind = cmp.lsp.CompletionItemKind.Text })
+
+			if is_lumen then
+				print("Meer specifiek, het is een Lumen project.")
+                for alias in string.gmatch(content, "%'as'%s*=>%s*%'([^']+)%'") do
+                    -- Gebruik een statische waarde voor 'kind' of laat het weg
+                    table.insert(routes, { label = alias, kind = cmp.lsp.CompletionItemKind.Text })
+                end
 			end
+		else
+			print("Dit is geen Laravel of Lumen project.")
 		end
 	else
 		vim.notify("Kon het bestand niet openen: " .. routes_php_path)
