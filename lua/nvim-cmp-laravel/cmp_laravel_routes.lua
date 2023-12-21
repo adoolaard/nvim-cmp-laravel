@@ -10,22 +10,42 @@ end
 
 -- Deze functie wordt aangeroepen door nvim-cmp om de beschikbare items te krijgen
 -- function source.complete(self, request, callback)
--- 	local routes = source.get_laravel_routes() -- Roep je functie aan om de routes op te halen
--- 	callback({ items = routes }) -- Geef de routes terug aan nvim-cmp
+-- 	local context = request.context
+-- 	local line = context.cursor_before_line
+-- 	local cursor_col = context.cursor.col
+--
+-- 	-- Check of de lijn eindigt met " route('"
+-- 	if string.sub(line, 1, cursor_col - 1):match("route%('") then
+-- 		local routes = source.get_laravel_routes() -- Haal routes op
+-- 		callback({ items = routes }) -- Geef de routes terug aan nvim-cmp
+-- 	else
+-- 		callback({ items = { "geen routes " } }) -- Geen matches, geef een lege lijst terug
+-- 	end
 -- end
 function source.complete(self, request, callback)
 	local context = request.context
 	local line = context.cursor_before_line
 	local cursor_col = context.cursor.col
 
-	-- Check of de lijn eindigt met " route('"
+	-- Hier verwijderen we de controle of de lijn eindigt met "route('"
+	-- en laden we de routes bij het openen van een Blade-bestand
+	local routes = source.get_laravel_routes() -- Haal routes op
+
+	-- Als we willen filteren op basis van wat er na "route('" komt
 	if string.sub(line, 1, cursor_col - 1):match("route%('") then
-		local routes = source.get_laravel_routes() -- Haal routes op
-		callback({ items = routes }) -- Geef de routes terug aan nvim-cmp
+		local match_pattern = string.sub(line, cursor_col)
+		local filtered_routes = {}
+		for _, route in ipairs(routes) do
+			if string.sub(route.label, 1, string.len(match_pattern)) == match_pattern then
+				table.insert(filtered_routes, route)
+			end
+		end
+		callback({ items = filtered_routes })
 	else
-		callback({ items = { "geen routes " } }) -- Geen matches, geef een lege lijst terug
+		callback({ items = routes }) -- Geef de routes terug aan nvim-cmp
 	end
 end
+
 
 -- Check de framework versie. Met "php artisan --version" staat er in een Lumen project ook "Lumen"
 
