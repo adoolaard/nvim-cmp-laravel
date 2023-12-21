@@ -12,6 +12,7 @@ local function setup()
         table.insert(sources, { name = 'laravel_routes', trigger_characters = cmp_laravel_routes.get_trigger_characters(), keyword_length = cmp_laravel_routes.get_keyword_length(), keyword_pattern = cmp_laravel_routes.get_keyword_pattern()})
     else
         table.insert(sources, { name = 'laravel_routes', keyword_length = cmp_laravel_routes.get_keyword_length(), keyword_pattern = cmp_laravel_routes.get_keyword_pattern()})
+    end
   -- table.insert(sources, { name = 'laravel_routes', trigger_characters = cmp_laravel_routes.get_trigger_characters(), keyword_length = cmp_laravel_routes.get_keyword_length(), keyword_pattern = cmp_laravel_routes.get_keyword_pattern()})
   cmp.setup({ sources = sources })
 end
