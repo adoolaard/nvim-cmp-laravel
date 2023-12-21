@@ -63,7 +63,6 @@ function source.get_laravel_routes()
     local routes = {}
     local is_laravel, is_lumen = source.is_laravel()
 
-    -- Voer het juiste artisan commando uit op basis van of het Laravel of Lumen is
     local command
     if is_laravel then
         print("Dit is een Laravel project.")
@@ -76,19 +75,23 @@ function source.get_laravel_routes()
         return routes
     end
 
-    -- Voer het commando uit en vang de output op
     local handle = io.popen(command, "r")
     if handle then
         local result = handle:read("*all")
         handle:close()
 
-        -- Verwerk de output en extraher de route namen
         local success, parsed = pcall(vim.fn.json_decode, result)
         if success then
             for _, route in ipairs(parsed) do
-                if route.name then
-                    -- Voeg de route naam toe aan de lijst met routes
-                    table.insert(routes, { label = route.name, kind = cmp.lsp.CompletionItemKind.Text })
+                local route_name
+                if is_laravel then
+                    route_name = route.name
+                elseif is_lumen then
+                    route_name = route.namedRoute
+                end
+
+                if route_name then
+                    table.insert(routes, { label = route_name, kind = cmp.lsp.CompletionItemKind.Text })
                 end
             end
         else
@@ -100,6 +103,7 @@ function source.get_laravel_routes()
 
     return routes
 end
+
 -- Deze functie wordt gebruikt door nvim-cmp om de source te identificeren
 function source.get_keyword_pattern()
 	-- return [[\w+]]
