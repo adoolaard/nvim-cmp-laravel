@@ -124,15 +124,24 @@ function source.get_laravel_routes()
 end
 
 -- Deze functie wordt gebruikt door nvim-cmp om de source te identificeren
+-- function source.get_keyword_pattern()
+-- 	-- return [[\w+]]
+-- 	return [[\croute('\w+]]
+-- end
+--
+-- -- Minimale lengte van de keyword om de source te triggeren
+-- function source.get_keyword_length()
+-- 	return 3
+-- end
+
 function source.get_keyword_pattern()
-	-- return [[\w+]]
-	return [[\croute('\w+]]
+	return [[\%(\croute('\)\@<=\k*]]
 end
 
--- Minimale lengte van de keyword om de source te triggeren
 function source.get_keyword_length()
-	return 3
+	return 1
 end
+
 
 -- Deze functie wordt gebruikt door nvim-cmp voor het sorteren van items
 -- function source.get_trigger_characters()
