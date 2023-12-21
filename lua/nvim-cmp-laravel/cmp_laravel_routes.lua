@@ -9,41 +9,41 @@ function source.new()
 end
 
 -- Deze functie wordt aangeroepen door nvim-cmp om de beschikbare items te krijgen
--- function source.complete(self, request, callback)
--- 	local context = request.context
--- 	local line = context.cursor_before_line
--- 	local cursor_col = context.cursor.col
---
--- 	-- Check of de lijn eindigt met " route('"
--- 	if string.sub(line, 1, cursor_col - 1):match("route%('") then
--- 		local routes = source.get_laravel_routes() -- Haal routes op
--- 		callback({ items = routes }) -- Geef de routes terug aan nvim-cmp
--- 	else
--- 		callback({ items = { "geen routes " } }) -- Geen matches, geef een lege lijst terug
--- 	end
--- end
 function source.complete(self, request, callback)
 	local context = request.context
 	local line = context.cursor_before_line
 	local cursor_col = context.cursor.col
 
-	-- Haal de huidige invoer op na "route('"
-	local _, route_prefix_end = line:find("route%('")
-	local current_input = route_prefix_end and line:sub(route_prefix_end + 1, cursor_col - 1) or ""
-
-	-- Haal routes op
-	local routes = source.get_laravel_routes()
-
-	-- Filter de routes op basis van de huidige invoer
-	local filtered_routes = {}
-	for _, route in ipairs(routes) do
-		if route.label:sub(1, #current_input) == current_input then
-			table.insert(filtered_routes, route)
-		end
+	-- Check of de lijn eindigt met " route('"
+	if string.sub(line, 1, cursor_col - 1):match("route%('") then
+		local routes = source.get_laravel_routes() -- Haal routes op
+		callback({ items = routes }) -- Geef de routes terug aan nvim-cmp
+	else
+		callback({ items = { "geen routes " } }) -- Geen matches, geef een lege lijst terug
 	end
-
-	callback({ items = filtered_routes })
 end
+-- function source.complete(self, request, callback)
+-- 	local context = request.context
+-- 	local line = context.cursor_before_line
+-- 	local cursor_col = context.cursor.col
+--
+-- 	-- Haal de huidige invoer op na "route('"
+-- 	local _, route_prefix_end = line:find("route%('")
+-- 	local current_input = route_prefix_end and line:sub(route_prefix_end + 1, cursor_col - 1) or ""
+--
+-- 	-- Haal routes op
+-- 	local routes = source.get_laravel_routes()
+--
+-- 	-- Filter de routes op basis van de huidige invoer
+-- 	local filtered_routes = {}
+-- 	for _, route in ipairs(routes) do
+-- 		if route.label:sub(1, #current_input) == current_input then
+-- 			table.insert(filtered_routes, route)
+-- 		end
+-- 	end
+--
+-- 	callback({ items = filtered_routes })
+-- end
 
 
 -- Check de framework versie. Met "php artisan --version" staat er in een Lumen project ook "Lumen"
@@ -124,23 +124,23 @@ function source.get_laravel_routes()
 end
 
 -- Deze functie wordt gebruikt door nvim-cmp om de source te identificeren
+function source.get_keyword_pattern()
+	-- return [[\w+]]
+	return [[\croute('\w+]]
+end
+
+-- Minimale lengte van de keyword om de source te triggeren
+function source.get_keyword_length()
+	return 3
+end
+
 -- function source.get_keyword_pattern()
--- 	-- return [[\w+]]
--- 	return [[\croute('\w+]]
+-- 	return [[\%(\croute('\)\@<=\k*]]
 -- end
 --
--- -- Minimale lengte van de keyword om de source te triggeren
 -- function source.get_keyword_length()
--- 	return 3
+-- 	return 1
 -- end
-
-function source.get_keyword_pattern()
-	return [[\%(\croute('\)\@<=\k*]]
-end
-
-function source.get_keyword_length()
-	return 1
-end
 
 
 -- Deze functie wordt gebruikt door nvim-cmp voor het sorteren van items
