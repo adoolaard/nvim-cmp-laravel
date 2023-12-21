@@ -47,52 +47,48 @@ function source.is_laravel(callback)
 end
 
 function source.get_laravel_routes(callback)
-	source.is_laravel(function(is_laravel, is_lumen)
-		if not is_laravel then
-			print("Dit is geen Laravel of Lumen project.")
-			callback({})
-			return
-		end
-
-		local artisan_command = "route:list --method=GET"
-		if is_lumen then
-			print("Het is een Lumen project.")
-			artisan_command = "route:list --columns=Verb --columns=NamedRoute --method=GET"
-        else
-            print("Het is een Laravel project.")
+    source.is_laravel(function(is_laravel, is_lumen)
+        if not is_laravel then
+            print("Dit is geen Laravel of Lumen project.")
+            callback({})
+            return
         end
 
-		local job = Job:new({
-			command = "php",
-			args = { "artisan", artisan_command },
-			cwd = vim.loop.cwd(),
-			on_stdout = function(_, line)
-				if is_lumen then
-					-- Lumen route parsing
-					local verb, route = line:match("| (%w+)%s+| ([%w%.%-_]+)%s+|")
-					if verb == "GET" and route then
-						table.insert(routes, { label = route, kind = cmp.lsp.CompletionItemKind.Text })
-					end
-				else
-					-- Laravel route parsing
-					local route = line:match("%s+GET|HEAD%s+([%w/%-_%.:]+)%s+")
-					if route then
-						table.insert(routes, { label = route, kind = cmp.lsp.CompletionItemKind.Text })
-					end
-				end
-			end,
-			on_exit = function(j, return_val)
-				if return_val == 0 then
-					callback(routes)
-				else
-					vim.notify("Kan route lijst niet ophalen.")
-					callback({})
-				end
-			end,
-		})
+        local routes = {} -- Definieer de routes tabel hier
 
-		job:start()
-	end)
+        local artisan_args = is_lumen and {"route:list", "--columns=Verb", "--columns=NamedRoute", "--method=GET"} or {"route:list", "--method=GET"}
+
+        local job = Job:new({
+            command = "php",
+            args = artisan_args,
+            cwd = vim.loop.cwd(),
+            on_stdout = function(_, line)
+                if is_lumen then
+                    -- Lumen route parsing
+                    local verb, route = line:match("| (%w+)%s+| ([%w%.%-_]+)%s+|")
+                    if verb == "GET" and route then
+                        table.insert(routes, { label = route, kind = cmp.lsp.CompletionItemKind.Text })
+                    end
+                else
+                    -- Laravel route parsing
+                    local _, _, route = line:match("(%s+GET|HEAD%s+)([%w/%-_%.:]+)(%s+)")
+                    if route then
+                        table.insert(routes, { label = route, kind = cmp.lsp.CompletionItemKind.Text })
+                    end
+                end
+            end,
+            on_exit = function(j, return_val)
+                if return_val == 0 then
+                    callback(routes)
+                else
+                    vim.notify("Kan route lijst niet ophalen.")
+                    callback({})
+                end
+            end
+        })
+
+        job:start()
+    end)
 end
 
 function source.get_keyword_pattern()
