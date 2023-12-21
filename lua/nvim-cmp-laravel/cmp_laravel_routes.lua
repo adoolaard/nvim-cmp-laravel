@@ -42,10 +42,11 @@ function source.is_laravel()
 			if return_val == 0 then
 				local version_output = table.concat(result, " ")
 				if version_output:match("Laravel Framework") then
-					is_laravel = true
 					if version_output:match("Lumen") then
 						is_lumen = true
-					end
+                    else
+                        is_laravel = true
+                    end
 				end
 			end
 		end,
