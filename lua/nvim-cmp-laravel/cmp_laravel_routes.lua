@@ -96,7 +96,8 @@ function source.get_laravel_routes()
 				end
 
 				if route_name then
-					table.insert(routes, { label = route_name, kind = cmp.lsp.CompletionItemKind.Text })
+					-- table.insert(routes, { label = route_name, kind = cmp.lsp.CompletionItemKind.Text })
+					table.insert(routes, { label = route_name, kind = cmp.lsp.CompletionItemKind.laravel_routes })
 				end
 			end
 		else
