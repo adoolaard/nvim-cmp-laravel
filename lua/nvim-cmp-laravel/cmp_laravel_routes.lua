@@ -119,9 +119,9 @@ function source.get_keyword_length()
 end
 
 -- Deze functie wordt gebruikt door nvim-cmp voor het sorteren van items
--- function source.get_trigger_characters()
--- 	return { "'", "(", "." } -- Voeg enkele extra tekens toe die relevant zijn
--- end
+function source.get_trigger_characters()
+	return { "'", "(", "." }
+end
 
 -- Deze functie wordt gebruikt om de source te identificeren (optioneel)
 function source.is_available()
