@@ -60,53 +60,46 @@ end
 
 -- Haal Laravel routes op en gebruik is_laravel() om te checken of het een Laravel project is. Verander de regex om de juiste routes te krijgen.
 function source.get_laravel_routes()
-	local routes = {}
-	local is_laravel, is_lumen = source.is_laravel()
+    local routes = {}
+    local is_laravel, is_lumen = source.is_laravel()
 
-	-- Voer het juiste artisan commando uit op basis van of het Laravel of Lumen is
-	local command
-	if is_laravel then
-		print("Dit is een Laravel project.")
-		command = "php artisan route:list --method=GET --no-ansi --sort=name --except-vendor "
-	elseif is_lumen then
-		print("Het is een Lumen project.")
-		command = "php artisan route:list --method=get --columns=NamedRoute"
-	else
-		print("Dit is geen Laravel of Lumen project.")
-		return routes
-	end
+    -- Voer het juiste artisan commando uit op basis van of het Laravel of Lumen is
+    local command
+    if is_laravel then
+        print("Dit is een Laravel project.")
+        command = "php artisan route:list --method=GET --no-ansi --json"
+    elseif is_lumen then
+        print("Het is een Lumen project.")
+        command = "php artisan route:list --method=get --columns=NamedRoute --json"
+    else
+        print("Dit is geen Laravel of Lumen project.")
+        return routes
+    end
 
-	-- Voer het commando uit en vang de output op
-	local handle = io.popen(command, "r")
-	if handle then
-		local result = handle:read("*all")
-		handle:close()
+    -- Voer het commando uit en vang de output op
+    local handle = io.popen(command, "r")
+    if handle then
+        local result = handle:read("*all")
+        handle:close()
 
-		-- Verwerk de output en extraher de route namen
-		for line in string.gmatch(result, "[^\r\n]+") do
-			local route_name
-			if is_laravel then
-				-- Match de route naam aan het einde van de regel, na de GET|HEAD en de URI
-				route_name = line:match("%s+GET|HEAD%s+[^%s]+%s+.-%s+(%S+)%s*$")
-			elseif is_lumen then
-				-- Match de route naam binnen de NamedRoute kolom
-				route_name = line:match("|%s*(%S+)%s*|")
-			end
+        -- Verwerk de output en extraher de route namen
+        local success, parsed = pcall(vim.fn.json_decode, result)
+        if success then
+            for _, route in ipairs(parsed) do
+                if route.name then
+                    -- Voeg de route naam toe aan de lijst met routes
+                    table.insert(routes, { label = route.name, kind = cmp.lsp.CompletionItemKind.Text })
+                end
+            end
+        else
+            vim.notify("Kon de JSON output niet parsen.")
+        end
+    else
+        vim.notify("Kon het Artisan commando niet uitvoeren.")
+    end
 
-			-- Zorg ervoor dat we geen headers of randen van de tabel toevoegen
-			if route_name and not route_name:match("^%+%-+$") and route_name ~= "NamedRoute" and route_name ~= "/" then
-				-- Voeg de route naam toe aan de lijst met routes
-				table.insert(routes, { label = route_name, kind = cmp.lsp.CompletionItemKind.Text })
-			end
-		end
-	else
-		vim.notify("Kon het Artisan commando niet uitvoeren.")
-	end
-	route_name = line:match("%s+GET|HEAD%s+%S+%s+.-%s+(%S+)%s+›")
-
-	return routes
+    return routes
 end
-
 -- Deze functie wordt gebruikt door nvim-cmp om de source te identificeren
 function source.get_keyword_pattern()
 	-- return [[\w+]]
