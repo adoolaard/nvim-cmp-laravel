@@ -86,7 +86,7 @@ function source.get_laravel_routes()
 		for line in string.gmatch(result, "[^\r\n]+") do
 			local route_name
 			if is_laravel then
-				route_name = line:match("%s+GET|HEAD%s+[^%s]+%s+.-%s+(%S+)%s*$")
+				route_name = line:match("%s+GET|HEAD%s+[^%s]+%s+.-%s+(%S+)%s+$")
 			elseif is_lumen then
 				route_name = line:match("|%s*(%S+)%s*|")
 			end
