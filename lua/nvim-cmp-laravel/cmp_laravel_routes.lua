@@ -23,15 +23,14 @@ function source.complete(self, request, callback)
 
 	-- Filter de routes op basis van de huidige invoer
 	local filtered_routes = {}
-    for _, route in ipairs(routes) do
-        -- Controleer of route.label een string is
-        if type(route.label) == "string" and route.label:sub(1, #current_input) == current_input then
-            table.insert(filtered_routes, route)
-        end
-    end
+	for _, route in ipairs(routes) do
+		-- Controleer of route.label een string is
+		if type(route.label) == "string" and route.label:sub(1, #current_input) == current_input then
+			table.insert(filtered_routes, route)
+		end
+	end
 	callback({ items = filtered_routes })
 end
-
 
 -- Check de framework versie. Met "php artisan --version" staat er in een Lumen project ook "Lumen"
 
@@ -66,48 +65,48 @@ end
 
 -- Haal Laravel routes op en gebruik is_laravel() om te checken of het een Laravel project is. Verander de regex om de juiste routes te krijgen.
 function source.get_laravel_routes()
-    local routes = {}
-    local is_laravel, is_lumen = source.is_laravel()
+	local routes = {}
+	local is_laravel, is_lumen = source.is_laravel()
 
-    local command
-    if is_laravel then
-        print("Dit is een Laravel project.")
-        command = "php artisan route:list --method=GET --no-ansi --json"
-    elseif is_lumen then
-        print("Het is een Lumen project.")
-        command = "php artisan route:list --method=get --columns=NamedRoute --json"
-    else
-        print("Dit is geen Laravel of Lumen project.")
-        return routes
-    end
+	local command
+	if is_laravel then
+		print("Dit is een Laravel project.")
+		command = "php artisan route:list --method=GET --no-ansi --json"
+	elseif is_lumen then
+		print("Het is een Lumen project.")
+		command = "php artisan route:list --method=get --columns=NamedRoute --json"
+	else
+		print("Dit is geen Laravel of Lumen project.")
+		return routes
+	end
 
-    local handle = io.popen(command, "r")
-    if handle then
-        local result = handle:read("*all")
-        handle:close()
+	local handle = io.popen(command, "r")
+	if handle then
+		local result = handle:read("*all")
+		handle:close()
 
-        local success, parsed = pcall(vim.fn.json_decode, result)
-        if success then
-            for _, route in ipairs(parsed) do
-                local route_name
-                if is_laravel then
-                    route_name = route.name
-                elseif is_lumen then
-                    route_name = route.namedRoute
-                end
+		local success, parsed = pcall(vim.fn.json_decode, result)
+		if success then
+			for _, route in ipairs(parsed) do
+				local route_name
+				if is_laravel then
+					route_name = route.name
+				elseif is_lumen then
+					route_name = route.namedRoute
+				end
 
-                if route_name then
-                    table.insert(routes, { label = route_name, kind = cmp.lsp.CompletionItemKind.Text })
-                end
-            end
-        else
-            vim.notify("Kon de JSON output niet parsen.")
-        end
-    else
-        vim.notify("Kon het Artisan commando niet uitvoeren.")
-    end
+				if route_name then
+					table.insert(routes, { label = route_name, kind = cmp.lsp.CompletionItemKind.Text })
+				end
+			end
+		else
+			vim.notify("Kon de JSON output niet parsen.")
+		end
+	else
+		vim.notify("Kon het Artisan commando niet uitvoeren.")
+	end
 
-    return routes
+	return routes
 end
 
 -- Deze functie wordt gebruikt door nvim-cmp om de source te identificeren
@@ -119,12 +118,7 @@ function source.get_keyword_length()
 	return 1
 end
 
-
 -- Deze functie wordt gebruikt door nvim-cmp voor het sorteren van items
--- function source.get_trigger_characters()
--- 	return { "." } -- Pas dit aan indien nodig voor je use-case
--- end
-
 -- function source.get_trigger_characters()
 -- 	return { "'", "(", "." } -- Voeg enkele extra tekens toe die relevant zijn
 -- end
