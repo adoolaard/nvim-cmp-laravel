@@ -86,12 +86,15 @@ function source.get_laravel_routes()
 		for line in string.gmatch(result, "[^\r\n]+") do
 			local route_name
 			if is_laravel then
-				route_name = line:match("%s+GET|HEAD%s+[^%s]+%s+.-%s+(%S+)%s+$")
+				-- Match de route naam aan het einde van de regel, na de GET|HEAD en de URI
+				route_name = line:match("%s+GET|HEAD%s+[^%s]+%s+.-%s+(%S+)%s*$")
 			elseif is_lumen then
+				-- Match de route naam binnen de NamedRoute kolom
 				route_name = line:match("|%s*(%S+)%s*|")
 			end
 
-			if route_name and not route_name:match("^+%-+$") and route_name ~= "NamedRoute" then
+			-- Zorg ervoor dat we geen headers of randen van de tabel toevoegen
+			if route_name and not route_name:match("^%+%-+$") and route_name ~= "NamedRoute" and route_name ~= "/" then
 				-- Voeg de route naam toe aan de lijst met routes
 				table.insert(routes, { label = route_name, kind = cmp.lsp.CompletionItemKind.Text })
 			end
