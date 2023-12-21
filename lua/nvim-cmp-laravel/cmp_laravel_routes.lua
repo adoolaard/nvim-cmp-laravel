@@ -9,20 +9,6 @@ function source.new()
 end
 
 -- Deze functie wordt aangeroepen door nvim-cmp om de beschikbare items te krijgen
--- function source.complete(self, request, callback)
--- 	local context = request.context
--- 	local line = context.cursor_before_line
--- 	local cursor_col = context.cursor.col
---
--- 	-- Check of de lijn eindigt met " route('"
--- 	if string.sub(line, 1, cursor_col - 1):match("route%('") then
--- 		local routes = source.get_laravel_routes() -- Haal routes op
--- 		callback({ items = routes }) -- Geef de routes terug aan nvim-cmp
--- 	else
--- 		callback({ items = { "geen routes " } }) -- Geen matches, geef een lege lijst terug
--- 	end
--- end
-
 function source.complete(self, request, callback)
 	local context = request.context
 	local line = context.cursor_before_line
@@ -125,16 +111,6 @@ function source.get_laravel_routes()
 end
 
 -- Deze functie wordt gebruikt door nvim-cmp om de source te identificeren
--- function source.get_keyword_pattern()
--- 	-- return [[\w+]]
--- 	return [[\croute('\w+]]
--- end
-
--- Minimale lengte van de keyword om de source te triggeren
--- function source.get_keyword_length()
--- 	return 3
--- end
-
 function source.get_keyword_pattern()
 	return [[\%(\croute('\)\@<=\k*]]
 end
@@ -148,9 +124,10 @@ end
 -- function source.get_trigger_characters()
 -- 	return { "." } -- Pas dit aan indien nodig voor je use-case
 -- end
-function source.get_trigger_characters()
-	return { "'", "(", "." } -- Voeg enkele extra tekens toe die relevant zijn
-end
+
+-- function source.get_trigger_characters()
+-- 	return { "'", "(", "." } -- Voeg enkele extra tekens toe die relevant zijn
+-- end
 
 -- Deze functie wordt gebruikt om de source te identificeren (optioneel)
 function source.is_available()
