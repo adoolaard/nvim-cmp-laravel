@@ -22,6 +22,7 @@ end
 -- 		callback({ items = { "geen routes " } }) -- Geen matches, geef een lege lijst terug
 -- 	end
 -- end
+
 function source.complete(self, request, callback)
 	local context = request.context
 	local line = context.cursor_before_line
@@ -36,12 +37,12 @@ function source.complete(self, request, callback)
 
 	-- Filter de routes op basis van de huidige invoer
 	local filtered_routes = {}
-	for _, route in ipairs(routes) do
-		if route.label:sub(1, #current_input) == current_input then
-			table.insert(filtered_routes, route)
-		end
-	end
-
+    for _, route in ipairs(routes) do
+        -- Controleer of route.label een string is
+        if type(route.label) == "string" and route.label:sub(1, #current_input) == current_input then
+            table.insert(filtered_routes, route)
+        end
+    end
 	callback({ items = filtered_routes })
 end
 
@@ -124,23 +125,23 @@ function source.get_laravel_routes()
 end
 
 -- Deze functie wordt gebruikt door nvim-cmp om de source te identificeren
-function source.get_keyword_pattern()
-	-- return [[\w+]]
-	return [[\croute('\w+]]
-end
+-- function source.get_keyword_pattern()
+-- 	-- return [[\w+]]
+-- 	return [[\croute('\w+]]
+-- end
 
 -- Minimale lengte van de keyword om de source te triggeren
-function source.get_keyword_length()
-	return 3
+-- function source.get_keyword_length()
+-- 	return 3
+-- end
+
+function source.get_keyword_pattern()
+	return [[\%(\croute('\)\@<=\k*]]
 end
 
--- function source.get_keyword_pattern()
--- 	return [[\%(\croute('\)\@<=\k*]]
--- end
---
--- function source.get_keyword_length()
--- 	return 1
--- end
+function source.get_keyword_length()
+	return 1
+end
 
 
 -- Deze functie wordt gebruikt door nvim-cmp voor het sorteren van items
