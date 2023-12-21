@@ -27,23 +27,22 @@ function source.complete(self, request, callback)
 	local line = context.cursor_before_line
 	local cursor_col = context.cursor.col
 
-	-- Hier verwijderen we de controle of de lijn eindigt met "route('"
-	-- en laden we de routes bij het openen van een Blade-bestand
-	local routes = source.get_laravel_routes() -- Haal routes op
+	-- Haal de huidige invoer op na "route('"
+	local _, route_prefix_end = line:find("route%('")
+	local current_input = route_prefix_end and line:sub(route_prefix_end + 1, cursor_col - 1) or ""
 
-	-- Als we willen filteren op basis van wat er na "route('" komt
-	if string.sub(line, 1, cursor_col - 1):match("route%('") then
-		local match_pattern = string.sub(line, cursor_col)
-		local filtered_routes = {}
-		for _, route in ipairs(routes) do
-			if string.sub(route.label, 1, string.len(match_pattern)) == match_pattern then
-				table.insert(filtered_routes, route)
-			end
+	-- Haal routes op
+	local routes = source.get_laravel_routes()
+
+	-- Filter de routes op basis van de huidige invoer
+	local filtered_routes = {}
+	for _, route in ipairs(routes) do
+		if route.label:sub(1, #current_input) == current_input then
+			table.insert(filtered_routes, route)
 		end
-		callback({ items = filtered_routes })
-	else
-		callback({ items = routes }) -- Geef de routes terug aan nvim-cmp
 	end
+
+	callback({ items = filtered_routes })
 end
 
 
