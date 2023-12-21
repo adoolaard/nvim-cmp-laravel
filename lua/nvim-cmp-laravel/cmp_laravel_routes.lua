@@ -69,7 +69,7 @@ function source.get_laravel_routes()
         command = "php artisan route:list --method=GET"
     elseif is_lumen then
         print("Het is een Lumen project.")
-        command = "php artisan route:list --columns=Verb --columns=NamedRoute --method=GET"
+        command = "php artisan route:list --method=get --columns=NamedRoute"
     else
         print("Dit is geen Laravel of Lumen project.")
         return routes
@@ -83,8 +83,14 @@ function source.get_laravel_routes()
 
         -- Verwerk de output en extraher de route namen
         for line in string.gmatch(result, "[^\r\n]+") do
-            local route_name = is_lumen and line:match("|%s*GET%s*|%s*(%S+)%s*|") or line:match("%s+GET|HEAD%s+%S+%s+.-%s+(%S+)%s+›")
-            if route_name and route_name ~= "NamedRoute" and route_name ~= "/" then
+            local route_name
+            if is_laravel then
+                route_name = line:match("%s+GET|HEAD%s+%S+%s+.-%s+(%S+)%s+›")
+            elseif is_lumen then
+                route_name = line:match("|%s*(%S+)%s*|")
+            end
+
+            if route_name and not route_name:match("^+%-+$") and route_name ~= "NamedRoute" then
                 -- Voeg de route naam toe aan de lijst met routes
                 table.insert(routes, { label = route_name, kind = cmp.lsp.CompletionItemKind.Text })
             end
@@ -95,6 +101,7 @@ function source.get_laravel_routes()
 
     return routes
 end
+
 -- Deze functie wordt gebruikt door nvim-cmp om de source te identificeren
 function source.get_keyword_pattern()
 	-- return [[\w+]]
