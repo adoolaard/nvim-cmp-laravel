@@ -126,6 +126,20 @@ end
 
 -- Deze functie wordt gebruikt om de source te identificeren (optioneel)
 function source.is_available()
+	return vim.bo.filetype == "blade" and source.has_laravel_files()
+end
+
+-- Controleer of bepaalde Laravel-bestanden aanwezig zijn in de huidige werkdirectory
+function source.has_laravel_files()
+	local required_files = { "artisan", "composer.json", "routes" }  -- Pas dit aan op basis van je behoeften
+
+	for _, file in ipairs(required_files) do
+		local full_path = vim.fn.getcwd() .. "/" .. file
+		if vim.fn.isdirectory(full_path) == 0 and vim.fn.filereadable(full_path) == 0 then
+			return false
+		end
+	end
+
 	return true
 end
 
