@@ -26,6 +26,8 @@ function source.complete(self, request, callback)
 	for _, route in ipairs(routes) do
 		-- Controleer of route.label een string is
 		if type(route.label) == "string" and route.label:sub(1, #current_input) == current_input then
+			-- table.insert(filtered_routes, route)
+			route.sort_text = "a" .. route.label -- "a" als prefix om het voor andere items te plaatsen
 			table.insert(filtered_routes, route)
 		end
 	end
@@ -131,7 +133,7 @@ end
 
 -- Controleer of bepaalde Laravel-bestanden aanwezig zijn in de huidige werkdirectory
 function source.has_laravel_files()
-	local required_files = { "artisan", "composer.json", "routes" }  -- Pas dit aan op basis van je behoeften
+	local required_files = { "artisan", "composer.json", "routes" } -- Pas dit aan op basis van je behoeften
 
 	for _, file in ipairs(required_files) do
 		local full_path = vim.fn.getcwd() .. "/" .. file
