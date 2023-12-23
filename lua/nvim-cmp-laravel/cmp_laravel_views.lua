@@ -194,11 +194,17 @@ function source:complete(params, callback)
         -- We only have "model('", suggest model names
         local models = source.get_laravel_model_names()
         callback({ items = models, isIncomplete = true })
-    elseif cursor_before_line:match("model%('([%w\\_%.]+)'%.") then
-        -- We have "model('ModelName').", extract the model name and suggest attributes
-        local model_name = cursor_before_line:match("model%('([%w\\_%.]+)'%.")
-        local attributes = source.get_model_attributes(model_name)
-        callback({ items = attributes, isIncomplete = true })
+    elseif cursor_before_line:match("model%('([%w\\_%.]+)'") then
+        -- We have "model('ModelName'", check if there's a trailing dot
+        local model_name = cursor_before_line:match("model%('([%w\\_%.]+)'")
+        if cursor_before_line:match("model%('([%w\\_%.]+)'%.$") then
+            -- We have a trailing dot, suggest attributes
+            local attributes = source.get_model_attributes(model_name)
+            callback({ items = attributes, isIncomplete = true })
+        else
+            -- No trailing dot, do nothing or suggest model names again (optional)
+            callback({ items = {}, isIncomplete = false })
+        end
     else
         callback({ items = {}, isIncomplete = false })
     end
