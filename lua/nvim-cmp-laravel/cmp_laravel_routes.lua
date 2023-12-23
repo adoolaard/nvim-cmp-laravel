@@ -16,8 +16,8 @@ function source.complete(self, request, callback)
 	local cursor_col = context.cursor.col
 
 	-- Haal de huidige invoer op na "route('"
-	local _, route_prefix_end = line:find("route%('")
-	-- local _, route_prefix_end = line:find("route%(")
+	-- local _, route_prefix_end = line:find("route%('")
+	local _, route_prefix_end = line:find("route%(")
 	local current_input = route_prefix_end and line:sub(route_prefix_end + 1, cursor_col - 1) or ""
 
 	-- Haal routes op
@@ -98,8 +98,8 @@ function source.get_laravel_routes()
 				end
 
 				if route_name then
-					-- table.insert(routes, { label = route_name, kind = cmp.lsp.CompletionItemKind.Text })
-					table.insert(routes, { label = route_name, kind = cmp.lsp.CompletionItemKind.laravel_routes })
+					-- table.insert(routes, { label = route_name, kind = cmp.lsp.CompletionItemKind.laravel_routes })
+					table.insert(routes, { label = "route('" .. route_name .. "')", kind = cmp.lsp.CompletionItemKind.laravel_routes })
 				end
 			end
 		else
@@ -117,10 +117,10 @@ end
 -- 	return [[\%(\croute('\)\@<=\k*]]
 -- end
 
-function source.get_keyword_length()
-	-- return 1
-	return 0
-end
+-- function source.get_keyword_length()
+-- 	-- return 1
+-- 	return 0
+-- end
 
 -- Deze functie wordt gebruikt door nvim-cmp voor het sorteren van items
 -- function source.get_trigger_characters()
