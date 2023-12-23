@@ -113,7 +113,7 @@ end
 -- Deze functie wordt gebruikt door nvim-cmp om de source te identificeren
 function source.get_keyword_pattern()
 	-- return [[\%(\croute('\)\@<=\k*]]
-	return [[\%(\croute('\)\@<=*]]
+	return [[\%(\croute('\)\@<=\k*]]
 end
 
 function source.get_keyword_length()
