@@ -16,8 +16,8 @@ function source.complete(self, request, callback)
 	local cursor_col = context.cursor.col
 
 	-- Haal de huidige invoer op na "route('"
-	-- local _, route_prefix_end = line:find("route%('")
-	local _, route_prefix_end = line:find("route%(")
+	local _, route_prefix_end = line:find("route%('")
+	-- local _, route_prefix_end = line:find("route%(")
 	local current_input = route_prefix_end and line:sub(route_prefix_end + 1, cursor_col - 1) or ""
 
 	-- Haal routes op
