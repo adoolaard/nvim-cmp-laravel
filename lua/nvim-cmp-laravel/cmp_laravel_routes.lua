@@ -122,8 +122,8 @@ function source.get_laravel_routes()
 					-- table.insert(routes, { label = route_name, kind = cmp.lsp.CompletionItemKind.laravel_routes })
 					table.insert(
 						routes,
+						-- { label = "route('" .. route_name .. "')", kind = cmp.lsp.CompletionItemKind.laravel_routes }
 						{ label = "route('" .. route_name .. "')", kind = cmp.lsp.CompletionItemKind.laravel_routes }
-						-- { label = "route('" .. tostring(route_name) .. "')", kind = cmp.lsp.CompletionItemKind.laravel_routes }
 					)
 				end
 			end
@@ -151,9 +151,9 @@ end
 -- function source.get_trigger_characters()
 -- 	return { "'", "(", "." }
 -- end
--- function source.get_trigger_characters()
--- 	return { "'" }
--- end
+function source.get_trigger_characters()
+	return { "'" }
+end
 
 -- Deze functie wordt gebruikt om de source te identificeren (optioneel)
 function source.is_available()
