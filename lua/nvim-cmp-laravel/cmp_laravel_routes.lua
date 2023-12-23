@@ -123,7 +123,7 @@ function source.get_laravel_routes()
 					table.insert(
 						routes,
 						-- { label = "route('" .. route_name .. "')", kind = cmp.lsp.CompletionItemKind.laravel_routes }
-						{ label = "route('" .. route_name .. "')", kind = cmp.lsp.CompletionItemKind.laravel_routes }
+						{ label = "route('" .. tostring(route_name) .. "')", kind = cmp.lsp.CompletionItemKind.laravel_routes }
 					)
 				end
 			end
