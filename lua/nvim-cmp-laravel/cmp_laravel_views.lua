@@ -8,7 +8,8 @@ function source.new()
 end
 
 function source:complete(params, callback)
-	if string.sub(params.context.cursor_before_line, params.offset - 8, params.offset - 1) == "return view('" then
+	-- if string.sub(params.context.cursor_before_line, params.offset - 8, params.offset - 1) == "return view('" then
+	if string.sub(params.context.cursor_before_line, params.offset - 8, params.offset - 1) == "view('" then
 		local views = source.get_laravel_views()
 
 		local filtered_views = {}
