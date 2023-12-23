@@ -36,13 +36,18 @@ function source.get_laravel_models_with_table_names()
 
                 -- Parse the JSON output
                 local ok, parsed = pcall(vim.fn.json_decode, model_info)
-                if ok and parsed and parsed.table then
-                    local table_name = parsed.table
-                    table.insert(models, {
-                        label = "model('" .. model_name .. "', '" .. table_name .. "')",
-                        kind = cmp.lsp.CompletionItemKind.Text,
-                    })
-                    vim.notify("Found model '" .. model_name .. "' with table name '" .. table_name .. "'.")
+                if ok and parsed and parsed.attributes then
+                    for _, attribute in ipairs(parsed.attributes) do
+                        local attribute_name = attribute.name
+                        if attribute_name then
+                            local full_name = model_name .. "." .. attribute_name
+                            table.insert(models, {
+                                label = full_name,
+                                kind = cmp.lsp.CompletionItemKind.Property,
+                            })
+                            vim.notify("Found attribute '" .. full_name .. "'.")
+                        end
+                    end
                 else
                     vim.notify("Failed to parse model information for '" .. model_name .. "'.")
                 end
