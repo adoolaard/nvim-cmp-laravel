@@ -26,6 +26,7 @@ function source:complete(params, callback)
 end
 
 function source.get_laravel_views()
+    print("get_laravel_views")
 	local views = {}
 	local root_path = vim.fn.getcwd()
 	local views_path = root_path .. "/resources/views"
@@ -33,7 +34,9 @@ function source.get_laravel_views()
 	local files, _, _ = scandir.scan_dir(views_path, { hidden = false, depth = 10 })
 
 	for _, file in ipairs(files) do
+        print("files: ", file)
 		if file.type == "file" and file.name:match("%.blade%.php$") then
+            print("blade: ", file.name")
 			local relative_path = vim.fn.fnamemodify(file.path, ":~:.")
 			local view_name = string.gsub(relative_path, "/", "."):sub(2, -11) -- Convert path to view name
 			table.insert(views, {
