@@ -112,13 +112,12 @@ end
 
 -- Deze functie wordt gebruikt door nvim-cmp om de source te identificeren
 function source.get_keyword_pattern()
-	-- return [[\%(\croute('\)\@<=\k*]]
-	return [[\%(\%(\k*\.\)*\croute('\)\@<=\k*]]
+	return [[\%(\croute('\)\@<=\k*]]
 end
 
 function source.get_keyword_length()
 	-- return 1
-	return 0
+    return 0
 end
 
 -- Deze functie wordt gebruikt door nvim-cmp voor het sorteren van items
@@ -133,7 +132,7 @@ end
 
 -- Controleer of bepaalde Laravel-bestanden aanwezig zijn in de huidige werkdirectory
 function source.has_laravel_files()
-	local required_files = { "artisan", "composer.json", "routes" } -- Pas dit aan op basis van je behoeften
+	local required_files = { "artisan", "composer.json", "routes" }  -- Pas dit aan op basis van je behoeften
 
 	for _, file in ipairs(required_files) do
 		local full_path = vim.fn.getcwd() .. "/" .. file
