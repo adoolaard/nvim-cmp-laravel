@@ -11,7 +11,8 @@ end
 -- Deze functie wordt aangeroepen door nvim-cmp om de beschikbare items te krijgen
 function source.complete(self, request, callback)
 	local context = request.context
-	local line = context.cursor_before_line
+	-- local line = context.cursor_before_line
+    local line = context.cursor_line
 	local cursor_col = context.cursor.col
 
 	-- Haal de huidige invoer op na "route('"
