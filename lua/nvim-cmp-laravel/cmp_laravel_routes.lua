@@ -12,7 +12,7 @@ end
 function source.complete(self, request, callback)
 	local context = request.context
 	local line = context.cursor_before_line
-    -- local line = context.cursor_line
+	-- local line = context.cursor_line
 	local cursor_col = context.cursor.col
 
 	-- Haal de huidige invoer op na "route('"
@@ -115,12 +115,13 @@ end
 -- Deze functie wordt gebruikt door nvim-cmp om de source te identificeren
 function source.get_keyword_pattern()
 	-- return [[\%(\croute('\)\@<=\k*]]
-    return "test"
+	return [[\w+]]
+	-- return [[\croute('\w+]]
 end
 
 function source.get_keyword_length()
 	-- return 1
-    return 0
+	return 0
 end
 
 -- Deze functie wordt gebruikt door nvim-cmp voor het sorteren van items
@@ -131,7 +132,6 @@ end
 --     return {}
 -- end
 
-
 -- Deze functie wordt gebruikt om de source te identificeren (optioneel)
 function source.is_available()
 	return vim.bo.filetype == "blade" and source.has_laravel_files()
@@ -139,7 +139,7 @@ end
 
 -- Controleer of bepaalde Laravel-bestanden aanwezig zijn in de huidige werkdirectory
 function source.has_laravel_files()
-	local required_files = { "artisan", "composer.json", "routes" }  -- Pas dit aan op basis van je behoeften
+	local required_files = { "artisan", "composer.json", "routes" } -- Pas dit aan op basis van je behoeften
 
 	for _, file in ipairs(required_files) do
 		local full_path = vim.fn.getcwd() .. "/" .. file
