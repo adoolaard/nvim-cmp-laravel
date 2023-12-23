@@ -125,7 +125,7 @@ end
 -- Deze functie wordt gebruikt door nvim-cmp voor het sorteren van items
 function source.get_trigger_characters()
 	-- return { "'", "(", "." }
-    retun {}
+    return {}
 end
 -- function source.get_trigger_characters()
 --     -- check of de lijn begint met "route(" (zonder de ' op het einde)
