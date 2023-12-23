@@ -12,7 +12,7 @@ local function setup()
 		sources,
 		{
 			name = "laravel_routes",
-            name = "laravel_views",
+            -- name = "laravel_views",
 		}
 	)
 	cmp.setup({ sources = sources })
