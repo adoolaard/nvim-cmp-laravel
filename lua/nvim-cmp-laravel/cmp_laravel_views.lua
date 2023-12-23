@@ -28,7 +28,8 @@ function source.get_laravel_model_names()
         for model_path in string.gmatch(result, "[^\r\n]+") do
             local model_name = model_path:sub(#models_path + 2, -5):gsub("/", "\\")
             table.insert(models, {
-                label = "model('" .. model_name .. "')",
+                -- label = "model('" .. model_name .. "')",
+                label = "model('" .. model_name,
                 kind = cmp.lsp.CompletionItemKind.Class,
             })
         end
