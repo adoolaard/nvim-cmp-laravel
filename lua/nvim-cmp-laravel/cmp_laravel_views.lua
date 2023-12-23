@@ -34,7 +34,7 @@ function source.get_laravel_models_with_table_names()
                 local table_name = model_file_content:match("protected%s*%$table%s*=%s*'([^']+)'")
                 if table_name then
                     table.insert(models, {
-                        vim.notify("Found model '" .. model_name .. "' with table name '" .. table_name .. "'.")
+                        vim.notify("Found model '" .. model_name .. "' with table name '" .. table_name .. "'."),
                         label = "model('" .. model_name .. "', '" .. table_name .. "')",
                         kind = cmp.lsp.CompletionItemKind.Text,
                     })
