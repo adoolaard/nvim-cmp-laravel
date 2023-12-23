@@ -11,6 +11,7 @@ end
 function source.get_laravel_models_with_table_names()
     local models = {}
     local models_path = vim.fn.getcwd() .. "/app/Models"
+    local cmp = require('cmp')
 
     -- Check if models path exists and is a directory
     if vim.fn.isdirectory(models_path) == 0 then
@@ -31,13 +32,14 @@ function source.get_laravel_models_with_table_names()
                 local model_file_content = model_file:read("*all")
                 model_file:close()
 
-                local table_name = model_file_content:match("protected%s*%$table%s*=%s*'([^']+)'")
+                -- Assuming the table name is set like protected $table = 'table_name';
+                local table_name = model_file_content:match("$table%s*=%s*'([^']+)'")
                 if table_name then
                     table.insert(models, {
-                        vim.notify("Found model '" .. model_name .. "' with table name '" .. table_name .. "'."),
                         label = "model('" .. model_name .. "', '" .. table_name .. "')",
                         kind = cmp.lsp.CompletionItemKind.Text,
                     })
+                    vim.notify("Found model '" .. model_name .. "' with table name '" .. table_name .. "'.")
                 end
             end
         end
