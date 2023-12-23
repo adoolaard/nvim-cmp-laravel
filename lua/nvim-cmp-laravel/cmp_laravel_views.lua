@@ -195,9 +195,9 @@ function source:complete(params, callback)
         callback({ items = models, isIncomplete = true })
     -- elseif cursor_before_line:match("model%('([%w\\_%.]+)'%-") then
     --     local model_name = cursor_before_line:match("model%('([%w\\_%.]+)'%-")
-    -- Verander de regex om de modelnaam te krijgen
-    elseif cursor_before_line:match("model%('([%w\\_%.]+)'%):") then
-        local model_name = cursor_before_line:match("model%('([%w\\_%.]+)'%):")
+    -- Verander even naar model('User voor testen
+    elseif cursor_before_line:match("model%('User'%-") then
+        local model_name = cursor_before_line:match("model%('User'%-")
         local attributes = source.get_model_attributes(model_name)
         callback({ items = attributes, isIncomplete = true })
     else
