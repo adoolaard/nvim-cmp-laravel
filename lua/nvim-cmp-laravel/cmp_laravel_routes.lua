@@ -43,7 +43,7 @@ function source:complete(params, callback)
 		local filtered_routes = {}
 		for _, route in ipairs(routes) do
 			-- Controleer of route.label een string is
-			if type(route.label) == "string" and route.label:sub(1, #current_input) == current_input then
+			if type(route.label) == "string" then
 				table.insert(filtered_routes, route)
 			end
 		end
