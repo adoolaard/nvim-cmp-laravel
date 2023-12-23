@@ -8,10 +8,10 @@ function source.new()
 	return setmetatable({}, { __index = source })
 end
 
--- Functie om alleen de modelnamen op te halen
-function source.get_laravel_model_names()
+function source.get_laravel_models_with_table_names()
     local models = {}
     local models_path = vim.fn.getcwd() .. "/app/Models"
+    local cmp = require('cmp')
 
     -- Check if models path exists and is a directory
     if vim.fn.isdirectory(models_path) == 0 then
@@ -27,10 +27,33 @@ function source.get_laravel_model_names()
 
         for model_path in string.gmatch(result, "[^\r\n]+") do
             local model_name = model_path:sub(#models_path + 2, -5):gsub("/", "\\")
-            table.insert(models, {
-                label = "model('" .. model_name .. "')",
-                kind = cmp.lsp.CompletionItemKind.Class,
-            })
+            -- Execute the artisan command to get model details
+            local command = "php artisan model:show " .. model_name .. " --json"
+            local model_handle = io.popen(command)
+            if model_handle then
+                local model_info = model_handle:read("*all")
+                model_handle:close()
+
+                -- Parse the JSON output
+                local ok, parsed = pcall(vim.fn.json_decode, model_info)
+                if ok and parsed and parsed.attributes then
+                    for _, attribute in ipairs(parsed.attributes) do
+                        local attribute_name = attribute.name
+                        if attribute_name then
+                            local full_name = model_name .. "." .. attribute_name
+                            table.insert(models, {
+                                label = full_name,
+                                kind = cmp.lsp.CompletionItemKind.Property,
+                            })
+                            -- vim.notify("Found attribute '" .. full_name .. "'.")
+                        end
+                    end
+                else
+                    vim.notify("Failed to parse model information for '" .. model_name .. "'.")
+                end
+            else
+                vim.notify("Could not execute artisan command for model '" .. model_name .. "'.")
+            end
         end
     else
         vim.notify("Could not read models directory.")
@@ -38,38 +61,6 @@ function source.get_laravel_model_names()
 
     return models
 end
-
--- Functie om de attributen van een specifiek model op te halen
-function source.get_model_attributes(model_name)
-    local attributes = {}
-    local command = "php artisan model:show " .. model_name .. " --json"
-    local model_handle = io.popen(command)
-    if model_handle then
-        local model_info = model_handle:read("*all")
-        model_handle:close()
-
-        -- Parse the JSON output
-        local ok, parsed = pcall(vim.fn.json_decode, model_info)
-        if ok and parsed and parsed.attributes then
-            for _, attribute in ipairs(parsed.attributes) do
-                local attribute_name = attribute.name
-                if attribute_name then
-                    local full_name = model_name .. "." .. attribute_name
-                    table.insert(attributes, {
-                        label = full_name,
-                        kind = cmp.lsp.CompletionItemKind.Property,
-                    })
-                end
-            end
-        else
-            vim.notify("Failed to parse model information for '" .. model_name .. "'.")
-        end
-    else
-        vim.notify("Could not execute artisan command for model '" .. model_name .. "'.")
-    end
-    return attributes
-end
-
 
 function source.get_laravel_views()
     local views = {}
@@ -180,9 +171,11 @@ function source.get_laravel_routes()
 end
 
 
-function source:complete(params, callback)
-    local cursor_before_line = string.sub(params.context.cursor_before_line, 1, params.offset - 1)
 
+-- Update the complete function
+function source:complete(params, callback)
+    -- Check if the input matches "route('" or "return view('"
+    local cursor_before_line = string.sub(params.context.cursor_before_line, 1, params.offset - 1)
     if cursor_before_line:match("route%('$") then
         local routes = source.get_laravel_routes()
         callback({ items = routes, isIncomplete = true })
@@ -190,16 +183,12 @@ function source:complete(params, callback)
         local views = source.get_laravel_views()
         callback({ items = views, isIncomplete = true })
     elseif cursor_before_line:match("model%('$") then
-        local models = source.get_laravel_model_names()
+        local models = source.get_laravel_models_with_table_names()
         callback({ items = models, isIncomplete = true })
-    elseif cursor_before_line:match("model%('([%w\\_%.]+)'%.") then
-        local model_name = cursor_before_line:match("model%('([%w\\_%.]+)'%.")
-        local attributes = source.get_model_attributes(model_name)
-   sIncomplete = false })
-    end
-end     callback({ items = attributes, isIncomplete = true })
     else
-        callback({ items = {}, i
+        callback({ items = {}, isIncomplete = false })
+    end
+end
 
 function source.get_trigger_characters()
 	return { "'" }
