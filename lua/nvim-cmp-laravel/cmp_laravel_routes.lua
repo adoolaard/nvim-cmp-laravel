@@ -127,7 +127,7 @@ end
 -- 	return { "'", "(", "." }
 -- end
 function source.get_trigger_characters()
-    local context = request.context
+    local context = vim.api.nvim_get_current_line()
     local line = context.cursor_before_line
 
     -- Kijk of "route('" in de huidige regel voorkomt en of de cursor zich voorbij het einde van "route('" bevindt
