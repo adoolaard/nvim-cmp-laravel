@@ -117,10 +117,32 @@ end
 
 
 
+-- -- Update the complete function
+-- function source:complete(params, callback)
+--     -- Check if the input matches "route('" or "return view('"
+--     local cursor_before_line = string.sub(params.context.cursor_before_line, 1, params.offset - 1)
+--     if cursor_before_line:match("route%('$") then
+--         local routes = source.get_laravel_routes()
+--         callback({ items = routes, isIncomplete = true })
+--     elseif cursor_before_line:match("return view%('$") then
+--         local views = source.get_laravel_views()
+--         callback({ items = views, isIncomplete = true })
+--     else
+--         callback({ items = {}, isIncomplete = false })
+--     end
+-- end
+
 -- Update the complete function
 function source:complete(params, callback)
     -- Check if the input matches "route('" or "return view('"
     local cursor_before_line = string.sub(params.context.cursor_before_line, 1, params.offset - 1)
+
+    -- Check if the cursor_before_line already ends with "')"
+    if cursor_before_line:match("route%('.$%)$") or cursor_before_line:match("return view%('.$%)$") then
+        callback({ items = {}, isIncomplete = false })
+        return
+    end
+
     if cursor_before_line:match("route%('$") then
         local routes = source.get_laravel_routes()
         callback({ items = routes, isIncomplete = true })
@@ -131,6 +153,8 @@ function source:complete(params, callback)
         callback({ items = {}, isIncomplete = false })
     end
 end
+
+
 
 function source.get_trigger_characters()
 	return { "'" }
