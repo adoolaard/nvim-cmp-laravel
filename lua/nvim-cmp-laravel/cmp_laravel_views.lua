@@ -8,6 +8,45 @@ function source.new()
 	return setmetatable({}, { __index = source })
 end
 
+function source.get_laravel_models_with_table_names()
+    local models = {}
+    local models_path = vim.fn.getcwd() .. "/app/Models"
+
+    -- Check if models path exists and is a directory
+    if vim.fn.isdirectory(models_path) == 0 then
+        vim.notify("Models directory not found.")
+        return models
+    end
+
+    -- Recursively list all files in the models directory
+    local handle = io.popen("find '" .. models_path .. "' -type f -name '*.php'")
+    if handle then
+        local result = handle:read("*all")
+        handle:close()
+
+        for model_path in string.gmatch(result, "[^\r\n]+") do
+            local model_name = model_path:sub(#models_path + 2, -5):gsub("/", "\\")
+            local model_file = io.open(model_path, "r")
+            if model_file then
+                local model_file_content = model_file:read("*all")
+                model_file:close()
+
+                local table_name = model_file_content:match("protected%s*%$table%s*=%s*'([^']+)'")
+                if table_name then
+                    table.insert(models, {
+                        label = "model('" .. model_name .. "', '" .. table_name .. "')",
+                        kind = cmp.lsp.CompletionItemKind.Text,
+                    })
+                end
+            end
+        end
+    else
+        vim.notify("Could not read models directory.")
+    end
+
+    return models
+end
+
 function source.get_laravel_views()
     local views = {}
     local views_path = vim.fn.getcwd() .. "/resources/views"
@@ -101,7 +140,6 @@ function source.get_laravel_routes()
 
 				if route_name then
 					table.insert(routes, {
-						-- label = "route('" .. tostring(route_name) .. "')",
 						label = "route('" .. tostring(route_name),
 						kind = cmp.lsp.CompletionItemKind.laravel_routes,
 					})
@@ -129,6 +167,9 @@ function source:complete(params, callback)
     elseif cursor_before_line:match("return view%('$") then
         local views = source.get_laravel_views()
         callback({ items = views, isIncomplete = true })
+    elseif cursor_before_line:match("model%('$") then
+        local models = source.get_laravel_models_with_table_names()
+        callback({ items = models, isIncomplete = true })
     else
         callback({ items = {}, isIncomplete = false })
     end
