@@ -27,20 +27,27 @@ function source.get_laravel_models_with_table_names()
 
         for model_path in string.gmatch(result, "[^\r\n]+") do
             local model_name = model_path:sub(#models_path + 2, -5):gsub("/", "\\")
-            local model_file = io.open(model_path, "r")
-            if model_file then
-                local model_file_content = model_file:read("*all")
-                model_file:close()
+            -- Execute the artisan command to get model details
+            local command = "php artisan model:show " .. model_name .. " --json"
+            local model_handle = io.popen(command)
+            if model_handle then
+                local model_info = model_handle:read("*all")
+                model_handle:close()
 
-                -- Assuming the table name is set like protected $table = 'table_name';
-                local table_name = model_file_content:match("$table%s*=%s*'([^']+)'")
-                if table_name then
+                -- Parse the JSON output
+                local ok, parsed = pcall(vim.fn.json_decode, model_info)
+                if ok and parsed and parsed.table then
+                    local table_name = parsed.table
                     table.insert(models, {
                         label = "model('" .. model_name .. "', '" .. table_name .. "')",
                         kind = cmp.lsp.CompletionItemKind.Text,
                     })
                     vim.notify("Found model '" .. model_name .. "' with table name '" .. table_name .. "'.")
+                else
+                    vim.notify("Failed to parse model information for '" .. model_name .. "'.")
                 end
+            else
+                vim.notify("Could not execute artisan command for model '" .. model_name .. "'.")
             end
         end
     else
