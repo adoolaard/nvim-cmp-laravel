@@ -34,27 +34,6 @@ function source.complete(self, request, callback)
 	callback({ items = filtered_routes })
 end
 
-function custom_source:complete(params, callback)
-	-- Controleer of de invoer overeenkomt met "route('"
-	if string.sub(params.context.cursor_before_line, params.offset - 7, params.offset - 1) == "route('" then
-		local routes = source.get_laravel_routes()
-
-		-- Filter de routes op basis van de huidige invoer
-		local filtered_routes = {}
-		for _, route in ipairs(routes) do
-			-- Controleer of route.label een string is
-			if type(route.label) == "string" and route.label:sub(1, #current_input) == current_input then
-				table.insert(filtered_routes, route)
-			end
-		end
-
-		-- callback({ items = self.get_keyword_items(), isIncomplete = true })
-        callback({ items = filtered_routes, isIncomplete = true })
-	else
-		callback({ items = {}, isIncomplete = false })
-	end
-end
-
 -- Check de framework versie. Met "php artisan --version" staat er in een Lumen project ook "Lumen"
 
 function source.is_laravel()
@@ -120,10 +99,7 @@ function source.get_laravel_routes()
 
 				if route_name then
 					-- table.insert(routes, { label = route_name, kind = cmp.lsp.CompletionItemKind.laravel_routes })
-					table.insert(
-						routes,
-						{ label = "route('" .. route_name .. "')", kind = cmp.lsp.CompletionItemKind.laravel_routes }
-					)
+					table.insert(routes, { label = "route('" .. route_name .. "')", kind = cmp.lsp.CompletionItemKind.laravel_routes })
 				end
 			end
 		else
@@ -151,7 +127,7 @@ end
 -- 	return { "'", "(", "." }
 -- end
 function source.get_trigger_characters()
-	return { "'" }
+    return {}
 end
 
 -- Deze functie wordt gebruikt om de source te identificeren (optioneel)
