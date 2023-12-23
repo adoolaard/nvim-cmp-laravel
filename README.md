@@ -5,8 +5,11 @@
 ## Features
 
 -[x] Autocomplete Laravel routes in blade files.
+
 -[ ] Support for view autocompletion
+
 -[ ] Support for database model autocompletion
+
 -[ ] And more
 
 ## Installation

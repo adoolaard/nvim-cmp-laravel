@@ -63,13 +63,13 @@ function source.get_laravel_routes()
 
 	local command
 	if is_laravel then
-		print("Dit is een Laravel project.")
+		-- print("Dit is een Laravel project.")
 		command = "php artisan route:list --method=GET --no-ansi --json"
 	elseif is_lumen then
-		print("Het is een Lumen project.")
+		-- print("Het is een Lumen project.")
 		command = "php artisan route:list --method=get --columns=NamedRoute --json"
 	else
-		print("Dit is geen Laravel of Lumen project.")
+		-- print("Dit is geen Laravel of Lumen project.")
 		return routes
 	end
 
