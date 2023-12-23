@@ -193,8 +193,11 @@ function source:complete(params, callback)
     elseif cursor_before_line:match("model%('$") then
         local models = source.get_laravel_model_names()
         callback({ items = models, isIncomplete = true })
-    elseif cursor_before_line:match("model%('([%w\\_%.]+)'%-") then
-        local model_name = cursor_before_line:match("model%('([%w\\_%.]+)'%-")
+    -- elseif cursor_before_line:match("model%('([%w\\_%.]+)'%-") then
+    --     local model_name = cursor_before_line:match("model%('([%w\\_%.]+)'%-")
+    -- Verander de punt naar -> om de attributen van het model op te halen
+    elseif cursor_before_line:match("model%('([%w\\_%.]+)'%->") then
+        local model_name = cursor_before_line:match("model%('([%w\\_%.]+)'%->")
         local attributes = source.get_model_attributes(model_name)
         callback({ items = attributes, isIncomplete = true })
     else
