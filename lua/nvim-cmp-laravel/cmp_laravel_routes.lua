@@ -9,32 +9,32 @@ function source.new()
 end
 
 -- Deze functie wordt aangeroepen door nvim-cmp om de beschikbare items te krijgen
-function source.complete(self, request, callback)
-	local context = request.context
-	local line = context.cursor_before_line
-	-- local line = context.cursor_line
-	local cursor_col = context.cursor.col
+-- function source.complete(self, request, callback)
+-- 	local context = request.context
+-- 	local line = context.cursor_before_line
+-- 	-- local line = context.cursor_line
+-- 	local cursor_col = context.cursor.col
+--
+-- 	-- Haal de huidige invoer op na "route('"
+-- 	-- local _, route_prefix_end = line:find("route%('")
+-- 	local _, route_prefix_end = line:find("route%(")
+-- 	local current_input = route_prefix_end and line:sub(route_prefix_end + 1, cursor_col - 1) or ""
+--
+-- 	-- Haal routes op
+-- 	local routes = source.get_laravel_routes()
+--
+-- 	-- Filter de routes op basis van de huidige invoer
+-- 	local filtered_routes = {}
+-- 	for _, route in ipairs(routes) do
+-- 		-- Controleer of route.label een string is
+-- 		if type(route.label) == "string" and route.label:sub(1, #current_input) == current_input then
+-- 			table.insert(filtered_routes, route)
+-- 		end
+-- 	end
+-- 	callback({ items = filtered_routes })
+-- end
 
-	-- Haal de huidige invoer op na "route('"
-	-- local _, route_prefix_end = line:find("route%('")
-	local _, route_prefix_end = line:find("route%(")
-	local current_input = route_prefix_end and line:sub(route_prefix_end + 1, cursor_col - 1) or ""
-
-	-- Haal routes op
-	local routes = source.get_laravel_routes()
-
-	-- Filter de routes op basis van de huidige invoer
-	local filtered_routes = {}
-	for _, route in ipairs(routes) do
-		-- Controleer of route.label een string is
-		if type(route.label) == "string" and route.label:sub(1, #current_input) == current_input then
-			table.insert(filtered_routes, route)
-		end
-	end
-	callback({ items = filtered_routes })
-end
-
-function custom_source:complete(params, callback)
+function source:complete(params, callback)
 	-- Controleer of de invoer overeenkomt met "route('"
 	if string.sub(params.context.cursor_before_line, params.offset - 7, params.offset - 1) == "route('" then
 		local routes = source.get_laravel_routes()
