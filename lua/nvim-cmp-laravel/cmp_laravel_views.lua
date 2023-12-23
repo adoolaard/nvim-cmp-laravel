@@ -180,6 +180,7 @@ function source.get_laravel_routes()
 end
 
 
+-- Update de complete functie om de nieuwe logica te gebruiken
 function source:complete(params, callback)
     local cursor_before_line = string.sub(params.context.cursor_before_line, 1, params.offset - 1)
 
@@ -192,15 +193,14 @@ function source:complete(params, callback)
     elseif cursor_before_line:match("model%('$") then
         local models = source.get_laravel_model_names()
         callback({ items = models, isIncomplete = true })
-    elseif cursor_before_line:match("model%('([%w\\_%.]+)'%.") then
-        local model_name = cursor_before_line:match("model%('([%w\\_%.]+)'%.")
+    elseif cursor_before_line:match("model%('([%w\\_%.]+)'%-") then
+        local model_name = cursor_before_line:match("model%('([%w\\_%.]+)'%-")
         local attributes = source.get_model_attributes(model_name)
         callback({ items = attributes, isIncomplete = true })
     else
         callback({ items = {}, isIncomplete = false })
     end
 end
-
 
 function source.get_trigger_characters()
 	return { "'" }
