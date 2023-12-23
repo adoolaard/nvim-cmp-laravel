@@ -11,8 +11,8 @@ end
 -- Deze functie wordt aangeroepen door nvim-cmp om de beschikbare items te krijgen
 function source.complete(self, request, callback)
 	local context = request.context
-	-- local line = context.cursor_before_line
-    local line = context.cursor_line
+	local line = context.cursor_before_line
+    -- local line = context.cursor_line
 	local cursor_col = context.cursor.col
 
 	-- Haal de huidige invoer op na "route('"
@@ -127,16 +127,17 @@ end
 -- 	return { "'", "(", "." }
 -- end
 function source.get_trigger_characters()
-    local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-    local line_content = vim.api.nvim_buf_get_lines(0, line - 1, line, false)[1]
+    local context = request.context
+    local line = context.cursor_before_line
 
     -- Kijk of "route('" in de huidige regel voorkomt en of de cursor zich voorbij het einde van "route('" bevindt
-    if line_content:find("route%'('", 1, true) and col > line_content:find("route%'('", 1, true) + 7 then
-    -- if line:find("route%('", 1, true) then
-        return { "'" }  -- Stel het triggerkarakter in op "'"
+    local _, route_prefix_end = line:find("route%('")
+    if route_prefix_end and context.cursor.col > route_prefix_end then
+        return { "'", "(", "." }
+    else
+        return {}
     end
 
-    return {}  -- Geen triggerkarakter
 end
 
 
