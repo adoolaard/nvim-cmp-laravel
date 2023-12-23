@@ -195,11 +195,12 @@ function source:complete(params, callback)
     elseif cursor_before_line:match("model%('([%w\\_%.]+)'%.") then
         local model_name = cursor_before_line:match("model%('([%w\\_%.]+)'%.")
         local attributes = source.get_model_attributes(model_name)
-   sIncomplete = false })
-    end
-end     callback({ items = attributes, isIncomplete = true })
+        callback({ items = attributes, isIncomplete = true })
     else
-        callback({ items = {}, i
+        callback({ items = {}, isIncomplete = false })
+    end
+end
+
 
 function source.get_trigger_characters()
 	return { "'" }
