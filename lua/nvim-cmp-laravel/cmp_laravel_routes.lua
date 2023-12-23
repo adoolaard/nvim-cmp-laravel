@@ -113,8 +113,7 @@ end
 
 -- Deze functie wordt gebruikt door nvim-cmp om de source te identificeren
 function source.get_keyword_pattern()
-	-- return [[\%(\croute('\)\@<=\k*]]
-	return [[\%(\croute('\)\@<=*]]
+	return [[\%(\croute('\)\@<=\k*]]
 end
 
 function source.get_keyword_length()
@@ -123,17 +122,13 @@ function source.get_keyword_length()
 end
 
 -- Deze functie wordt gebruikt door nvim-cmp voor het sorteren van items
+-- function source.get_trigger_characters()
+-- 	return { "'", "(", "." }
+-- end
 function source.get_trigger_characters()
-	-- return { "'", "(", "." }
+    -- even niks
     return {}
 end
--- function source.get_trigger_characters()
---     -- check of de lijn begint met "route(" (zonder de ' op het einde)
---       : return { "'", "(", "." }
---     else
---         return {}
---     end
--- end
 
 
 -- Deze functie wordt gebruikt om de source te identificeren (optioneel)
