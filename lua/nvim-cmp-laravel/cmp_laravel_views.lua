@@ -58,9 +58,9 @@ function source.get_trigger_characters()
 end
 
 -- Deze functie wordt gebruikt om de source te identificeren (optioneel)
-function source.is_available()
-	return vim.bo.filetype == "blade" and source.has_laravel_files()
-end
+-- function source.is_available()
+-- 	return vim.bo.filetype == "php" and source.has_laravel_files()
+-- end
 
 -- Controleer of bepaalde Laravel-bestanden aanwezig zijn in de huidige werkdirectory
 function source.has_laravel_files()
