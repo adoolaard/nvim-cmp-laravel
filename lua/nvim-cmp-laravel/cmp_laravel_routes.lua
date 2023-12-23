@@ -131,7 +131,7 @@ function source.get_trigger_characters()
 
     -- Kijk of "route('" in de huidige regel voorkomt en of de cursor zich voorbij het einde van "route('" bevindt
     -- if line_content:find("route%'('", 1, true) and col > line_content:find("route%'('", 1, true) + 7 then
-    if line:find("route%('", 1, true)
+    if line:find("route%('", 1, true) then
         return { "'" }  -- Stel het triggerkarakter in op "'"
     end
 
