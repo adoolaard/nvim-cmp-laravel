@@ -128,7 +128,7 @@ end
 -- end
 function source.get_trigger_characters()
     -- check of de lijn begint met "route("
-    if vim.fn.matchstr(vim.fn.getline('.'), [[\%(\croute('\)\@<=\k*]]) == 0 then
+    if vim.fn.matchstr(vim.fn.getline('.'), [[\%(\croute(\)\@<=\k*]]) == 0 then
         return { "'", "(", "." }
     else
         return {}
