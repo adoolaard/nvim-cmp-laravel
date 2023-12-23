@@ -11,7 +11,7 @@ local function setup()
 		sources,
 		{
 			name = "laravel_routes",
-			-- trigger_characters = cmp_laravel_routes.get_trigger_characters(),
+			trigger_characters = cmp_laravel_routes.get_trigger_characters(),
 			keyword_length = cmp_laravel_routes.get_keyword_length(),
 			keyword_pattern = cmp_laravel_routes.get_keyword_pattern(),
 		}
