@@ -27,6 +27,7 @@ end
 
 function source.get_laravel_views()
     print("get_laravel_views")
+    vim.notify("get_laravel_views")
 	local views = {}
 	local root_path = vim.fn.getcwd()
 	local views_path = root_path .. "/resources/views"
