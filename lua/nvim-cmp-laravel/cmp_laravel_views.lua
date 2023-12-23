@@ -28,8 +28,7 @@ function source.get_laravel_model_names()
         for model_path in string.gmatch(result, "[^\r\n]+") do
             local model_name = model_path:sub(#models_path + 2, -5):gsub("/", "\\")
             table.insert(models, {
-                -- label = "model('" .. model_name .. "')",
-                label = "model('" .. model_name,
+                label = "model('" .. model_name .. "')",
                 kind = cmp.lsp.CompletionItemKind.Class,
             })
         end
@@ -180,6 +179,7 @@ function source.get_laravel_routes()
 	return routes
 end
 
+
 -- Update de complete functie om de nieuwe logica te gebruiken
 function source:complete(params, callback)
     local cursor_before_line = string.sub(params.context.cursor_before_line, 1, params.offset - 1)
@@ -191,25 +191,16 @@ function source:complete(params, callback)
         local views = source.get_laravel_views()
         callback({ items = views, isIncomplete = true })
     elseif cursor_before_line:match("model%('$") then
-        -- We only have "model('", suggest model names
         local models = source.get_laravel_model_names()
         callback({ items = models, isIncomplete = true })
-    elseif cursor_before_line:match("model%('([%w\\_%.]+)'") then
-        -- We have "model('ModelName'", check if there's a trailing dot
-        local model_name = cursor_before_line:match("model%('([%w\\_%.]+)'")
-        if cursor_before_line:match("model%('([%w\\_%.]+)'%.$") then
-            -- We have a trailing dot, suggest attributes
-            local attributes = source.get_model_attributes(model_name)
-            callback({ items = attributes, isIncomplete = true })
-        else
-            -- No trailing dot, do nothing or suggest model names again (optional)
-            callback({ items = {}, isIncomplete = false })
-        end
+    elseif cursor_before_line:match("model%('([%w\\_%.]+)'%-") then
+        local model_name = cursor_before_line:match("model%('([%w\\_%.]+)'%-")
+        local attributes = source.get_model_attributes(model_name)
+        callback({ items = attributes, isIncomplete = true })
     else
         callback({ items = {}, isIncomplete = false })
     end
 end
-
 
 function source.get_trigger_characters()
 	return { "'" }
