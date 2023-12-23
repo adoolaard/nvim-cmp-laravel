@@ -8,32 +8,6 @@ function source.new()
 	return setmetatable({}, { __index = source })
 end
 
--- Deze functie wordt aangeroepen door nvim-cmp om de beschikbare items te krijgen
--- function source.complete(self, request, callback)
--- 	local context = request.context
--- 	local line = context.cursor_before_line
--- 	-- local line = context.cursor_line
--- 	local cursor_col = context.cursor.col
---
--- 	-- Haal de huidige invoer op na "route('"
--- 	-- local _, route_prefix_end = line:find("route%('")
--- 	local _, route_prefix_end = line:find("route%(")
--- 	local current_input = route_prefix_end and line:sub(route_prefix_end + 1, cursor_col - 1) or ""
---
--- 	-- Haal routes op
--- 	local routes = source.get_laravel_routes()
---
--- 	-- Filter de routes op basis van de huidige invoer
--- 	local filtered_routes = {}
--- 	for _, route in ipairs(routes) do
--- 		-- Controleer of route.label een string is
--- 		if type(route.label) == "string" and route.label:sub(1, #current_input) == current_input then
--- 			table.insert(filtered_routes, route)
--- 		end
--- 	end
--- 	callback({ items = filtered_routes })
--- end
-
 function source:complete(params, callback)
 	-- Controleer of de invoer overeenkomt met "route('"
 	if string.sub(params.context.cursor_before_line, params.offset - 7, params.offset - 1) == "route('" then
@@ -49,13 +23,11 @@ function source:complete(params, callback)
 		end
 
 		-- callback({ items = self.get_keyword_items(), isIncomplete = true })
-        callback({ items = filtered_routes, isIncomplete = true })
+		callback({ items = filtered_routes, isIncomplete = true })
 	else
 		callback({ items = {}, isIncomplete = false })
 	end
 end
-
--- Check de framework versie. Met "php artisan --version" staat er in een Lumen project ook "Lumen"
 
 function source.is_laravel()
 	local is_laravel = false
@@ -82,11 +54,9 @@ function source.is_laravel()
 
 	job:sync() -- This will wait for the job to finish
 
-	-- Return two booleans: is_laravel, is_lumen
 	return is_laravel, is_lumen
 end
 
--- Haal Laravel routes op en gebruik is_laravel() om te checken of het een Laravel project is. Verander de regex om de juiste routes te krijgen.
 function source.get_laravel_routes()
 	local routes = {}
 	local is_laravel, is_lumen = source.is_laravel()
@@ -119,12 +89,10 @@ function source.get_laravel_routes()
 				end
 
 				if route_name then
-					-- table.insert(routes, { label = route_name, kind = cmp.lsp.CompletionItemKind.laravel_routes })
-					table.insert(
-						routes,
-						-- { label = "route('" .. route_name .. "')", kind = cmp.lsp.CompletionItemKind.laravel_routes }
-						{ label = "route('" .. tostring(route_name) .. "')", kind = cmp.lsp.CompletionItemKind.laravel_routes }
-					)
+					table.insert(routes, {
+						label = "route('" .. tostring(route_name) .. "')",
+						kind = cmp.lsp.CompletionItemKind.laravel_routes,
+					})
 				end
 			end
 		else
@@ -137,20 +105,6 @@ function source.get_laravel_routes()
 	return routes
 end
 
--- Deze functie wordt gebruikt door nvim-cmp om de source te identificeren
--- function source.get_keyword_pattern()
--- 	return [[\%(\croute('\)\@<=\k*]]
--- end
-
--- function source.get_keyword_length()
--- 	-- return 1
--- 	return 0
--- end
-
--- Deze functie wordt gebruikt door nvim-cmp voor het sorteren van items
--- function source.get_trigger_characters()
--- 	return { "'", "(", "." }
--- end
 function source.get_trigger_characters()
 	return { "'" }
 end
