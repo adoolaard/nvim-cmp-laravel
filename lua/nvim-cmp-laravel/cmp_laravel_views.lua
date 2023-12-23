@@ -190,22 +190,20 @@ function source:complete(params, callback)
     elseif cursor_before_line:match("return view%('$") then
         local views = source.get_laravel_views()
         callback({ items = views, isIncomplete = true })
-    elseif cursor_before_line:match("model%('%w") then
-        -- Check if we have a partial model name (e.g., "model('User")
-        local partial_model_name = cursor_before_line:match("model%('([%w\\_%.]*)")
-        if partial_model_name and not partial_model_name:match("%.$") then
-            -- We have a partial name without a trailing dot, suggest model names
-            local models = source.get_laravel_model_names()
-            callback({ items = models, isIncomplete = true })
+    elseif cursor_before_line:match("model%('$") then
+        -- We only have "model('", suggest model names
+        local models = source.get_laravel_model_names()
+        callback({ items = models, isIncomplete = true })
+    elseif cursor_before_line:match("model%('([%w\\_%.]+)'") then
+        -- We have "model('ModelName'", check if there's a trailing dot
+        local model_name = cursor_before_line:match("model%('([%w\\_%.]+)'")
+        if cursor_before_line:match("model%('([%w\\_%.]+)'%.$") then
+            -- We have a trailing dot, suggest attributes
+            local attributes = source.get_model_attributes(model_name)
+            callback({ items = attributes, isIncomplete = true })
         else
-            -- We have a full model name with a trailing dot, suggest attributes
-            local model_name = cursor_before_line:match("model%('([%w\\_%.]+)'%.")
-            if model_name then
-                local attributes = source.get_model_attributes(model_name)
-                callback({ items = attributes, isIncomplete = true })
-            else
-                callback({ items = {}, isIncomplete = false })
-            end
+            -- No trailing dot, do nothing or suggest model names again (optional)
+            callback({ items = {}, isIncomplete = false })
         end
     else
         callback({ items = {}, isIncomplete = false })
