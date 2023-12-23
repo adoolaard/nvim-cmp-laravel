@@ -180,7 +180,6 @@ function source.get_laravel_routes()
 	return routes
 end
 
-
 -- Update de complete functie om de nieuwe logica te gebruiken
 function source:complete(params, callback)
     local cursor_before_line = string.sub(params.context.cursor_before_line, 1, params.offset - 1)
@@ -191,17 +190,28 @@ function source:complete(params, callback)
     elseif cursor_before_line:match("return view%('$") then
         local views = source.get_laravel_views()
         callback({ items = views, isIncomplete = true })
-    elseif cursor_before_line:match("model%('$") then
-        local models = source.get_laravel_model_names()
-        callback({ items = models, isIncomplete = true })
-    elseif cursor_before_line:match("model%('([%w\\_%.]+)'%-") then
-        local model_name = cursor_before_line:match("model%('([%w\\_%.]+)'%-")
-        local attributes = source.get_model_attributes(model_name)
-        callback({ items = attributes, isIncomplete = true })
+    elseif cursor_before_line:match("model%('%w") then
+        -- Check if we have a partial model name (e.g., "model('User")
+        local partial_model_name = cursor_before_line:match("model%('([%w\\_%.]*)")
+        if partial_model_name and not partial_model_name:match("%.$") then
+            -- We have a partial name without a trailing dot, suggest model names
+            local models = source.get_laravel_model_names()
+            callback({ items = models, isIncomplete = true })
+        else
+            -- We have a full model name with a trailing dot, suggest attributes
+            local model_name = cursor_before_line:match("model%('([%w\\_%.]+)'%.")
+            if model_name then
+                local attributes = source.get_model_attributes(model_name)
+                callback({ items = attributes, isIncomplete = true })
+            else
+                callback({ items = {}, isIncomplete = false })
+            end
+        end
     else
         callback({ items = {}, isIncomplete = false })
     end
 end
+
 
 function source.get_trigger_characters()
 	return { "'" }
