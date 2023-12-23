@@ -21,22 +21,20 @@ function source.get_laravel_models_with_table_names()
     -- Recursively list all files in the models directory
     local handle = io.popen("find '" .. models_path .. "' -type f -name '*.php'")
     if handle then
-        vim.notify("Found models directory.")
         local result = handle:read("*all")
         handle:close()
 
         for model_path in string.gmatch(result, "[^\r\n]+") do
-            vim.notify("Found model: " .. model_path)
             local model_name = model_path:sub(#models_path + 2, -5):gsub("/", "\\")
             local model_file = io.open(model_path, "r")
             if model_file then
                 local model_file_content = model_file:read("*all")
                 model_file:close()
-                vim.notify("Found model file: " .. model_file_content)
 
                 local table_name = model_file_content:match("protected%s*%$table%s*=%s*'([^']+)'")
                 if table_name then
                     table.insert(models, {
+                        vim.notify("Found model '" .. model_name .. "' with table name '" .. table_name .. "'.")
                         label = "model('" .. model_name .. "', '" .. table_name .. "')",
                         kind = cmp.lsp.CompletionItemKind.Text,
                     })
