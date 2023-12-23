@@ -38,6 +38,55 @@ function source.get_laravel_views()
     return views
 end
 
+function source.get_laravel_routes()
+	local routes = {}
+	local is_laravel, is_lumen = source.is_laravel()
+
+	local command
+	if is_laravel then
+		-- print("Dit is een Laravel project.")
+		command = "php artisan route:list --method=GET --no-ansi --json"
+	elseif is_lumen then
+		-- print("Het is een Lumen project.")
+		command = "php artisan route:list --method=get --columns=NamedRoute --json"
+	else
+		-- print("Dit is geen Laravel of Lumen project.")
+		return routes
+	end
+
+	local handle = io.popen(command, "r")
+	if handle then
+		local result = handle:read("*all")
+		handle:close()
+
+		local success, parsed = pcall(vim.fn.json_decode, result)
+		if success then
+			for _, route in ipairs(parsed) do
+				local route_name
+				if is_laravel then
+					route_name = route.name
+				elseif is_lumen then
+					route_name = route.namedRoute
+				end
+
+				if route_name then
+					table.insert(routes, {
+						label = "route('" .. tostring(route_name) .. "')",
+						kind = cmp.lsp.CompletionItemKind.laravel_routes,
+					})
+				end
+			end
+		else
+			vim.notify("Kon de JSON output niet parsen.")
+		end
+	else
+		vim.notify("Kon het Artisan commando niet uitvoeren.")
+	end
+
+	return routes
+end
+
+
 -- Update the complete function
 function source:complete(params, callback)
     -- Check if the input matches "route('" or "return view('"
@@ -58,9 +107,10 @@ function source.get_trigger_characters()
 end
 
 -- Deze functie wordt gebruikt om de source te identificeren (optioneel)
--- function source.is_available()
--- 	return vim.bo.filetype == "php" and source.has_laravel_files()
--- end
+function source.is_available()
+	-- return vim.bo.filetype == "php" and source.has_laravel_files()
+	return vim.bo.filetype == "php" or vim.bo.filetype == "blade" and source.has_laravel_files()
+end
 
 -- Controleer of bepaalde Laravel-bestanden aanwezig zijn in de huidige werkdirectory
 function source.has_laravel_files()
