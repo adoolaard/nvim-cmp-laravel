@@ -52,7 +52,7 @@ end
 
 -- Deze functie wordt gebruikt om de source te identificeren (optioneel)
 function source.is_available()
-	return vim.bo.filetype == "blade" and source.has_laravel_files()
+	return vim.bo.filetype == "php" and source.has_laravel_files()
 end
 
 -- Controleer of bepaalde Laravel-bestanden aanwezig zijn in de huidige werkdirectory
