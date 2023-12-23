@@ -123,21 +123,21 @@ function source.get_keyword_length()
 end
 
 -- Deze functie wordt gebruikt door nvim-cmp voor het sorteren van items
-function source.get_trigger_characters()
-	return { "'", "(", "." }
-end
 -- function source.get_trigger_characters()
---     local line, col = unpack(vim.api.nvim_win_get_cursor(0))
---     local line_content = vim.api.nvim_buf_get_lines(0, line - 1, line, false)[1]
---
---     -- Kijk of "route('" in de huidige regel voorkomt en of de cursor zich voorbij het einde van "route('" bevindt
---     -- if line_content:find("route%'('", 1, true) and col > line_content:find("route%'('", 1, true) + 7 then
---     if line:find("route%('", 1, true) then
---         return { "'" }  -- Stel het triggerkarakter in op "'"
---     end
---
---     return {}  -- Geen triggerkarakter
+-- 	return { "'", "(", "." }
 -- end
+function source.get_trigger_characters()
+    local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+    local line_content = vim.api.nvim_buf_get_lines(0, line - 1, line, false)[1]
+
+    -- Kijk of "route('" in de huidige regel voorkomt en of de cursor zich voorbij het einde van "route('" bevindt
+    if line_content:find("route%'('", 1, true) and col > line_content:find("route%'('", 1, true) + 7 then
+    -- if line:find("route%('", 1, true) then
+        return { "'" }  -- Stel het triggerkarakter in op "'"
+    end
+
+    return {}  -- Geen triggerkarakter
+end
 
 
 -- Deze functie wordt gebruikt om de source te identificeren (optioneel)
