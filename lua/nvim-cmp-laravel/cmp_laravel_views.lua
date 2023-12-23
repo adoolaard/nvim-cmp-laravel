@@ -1,63 +1,65 @@
 local cmp = require("cmp")
-local scandir = require("plenary.scandir")
+local Job = require("plenary.job")
 
 local source = {}
 
+-- Deze functie wordt aangeroepen door nvim-cmp om de source te initialiseren
 function source.new()
 	return setmetatable({}, { __index = source })
 end
 
-function source:complete(params, callback)
-	-- if string.sub(params.context.cursor_before_line, params.offset - 8, params.offset - 1) == "return view('" then
-	-- if string.sub(params.context.cursor_before_line, params.offset - 8, params.offset - 1) == "view('" then
-	local views = source.get_laravel_views()
-
-	local filtered_views = {}
-	for _, view in ipairs(views) do
-		if type(view.label) == "string" then
-			table.insert(filtered_views, view)
-		end
-	end
-
-	callback({ items = filtered_views, isIncomplete = true })
-	-- else
-	-- 	callback({ items = {}, isIncomplete = false })
-	-- end
-end
-
 function source.get_laravel_views()
-	print("get_laravel_views")
-	vim.notify("get_laravel_views")
-	local views = {}
-	local root_path = vim.fn.getcwd()
-	local views_path = root_path .. "/resources/views"
+    local views = {}
+    local views_path = vim.fn.getcwd() .. "/resources/views"
 
-	local files, _, _ = scandir.scan_dir(views_path, { hidden = false, depth = 10 })
+    -- Check if views path exists and is a directory
+    if vim.fn.isdirectory(views_path) == 0 then
+        vim.notify("Views directory not found.")
+        return views
+    end
 
-	for _, file in ipairs(files) do
-		print("files: ", file)
-		if file.type == "file" and file.name:match("%.blade%.php$") then
-			print("blade: ", file.name)
-			local relative_path = vim.fn.fnamemodify(file.path, ":~:.")
-			local view_name = string.gsub(relative_path, "/", "."):sub(2, -11) -- Convert path to view name
-			table.insert(views, {
-				label = "view('" .. tostring(view_name) .. "')",
-				kind = cmp.lsp.CompletionItemKind.laravel_views,
-			})
-		end
-	end
+    -- Recursively list all files in the views directory
+    local handle = io.popen("find '" .. views_path .. "' -type f -name '*.blade.php'")
+    if handle then
+        local result = handle:read("*all")
+        handle:close()
 
-	return views
+        for view_path in string.gmatch(result, "[^\r\n]+") do
+            local view_name = view_path:sub(#views_path + 2, -11):gsub("/", ".")
+            table.insert(views, {
+                label = "view('" .. view_name .. "')",
+                kind = cmp.lsp.CompletionItemKind.Text,
+            })
+        end
+    else
+        vim.notify("Could not read views directory.")
+    end
+
+    return views
 end
 
--- Rest van de code blijft hetzelfde...
+-- Update the complete function
+function source:complete(params, callback)
+    -- Check if the input matches "route('" or "return view('"
+    local cursor_before_line = string.sub(params.context.cursor_before_line, 1, params.offset - 1)
+    if cursor_before_line:match("route%('$") then
+        local routes = source.get_laravel_routes()
+        callback({ items = routes, isIncomplete = true })
+    elseif cursor_before_line:match("return view%('$") then
+        local views = source.get_laravel_views()
+        callback({ items = views, isIncomplete = true })
+    else
+        callback({ items = {}, isIncomplete = false })
+    end
+end
+
 function source.get_trigger_characters()
 	return { "'" }
 end
 
 -- Deze functie wordt gebruikt om de source te identificeren (optioneel)
 function source.is_available()
-	return vim.bo.filetype == "php" and source.has_laravel_files()
+	return vim.bo.filetype == "blade" and source.has_laravel_files()
 end
 
 -- Controleer of bepaalde Laravel-bestanden aanwezig zijn in de huidige werkdirectory
@@ -75,3 +77,4 @@ function source.has_laravel_files()
 end
 
 return source
+
